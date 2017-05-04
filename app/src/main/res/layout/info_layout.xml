@@ -1,117 +1,99 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical" android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
 
     <android.support.design.widget.TextInputLayout
-        android:orientation="horizontal"
+        android:id="@+id/name_edit"
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="@dimen/info_layout_item_height">
+
         <EditText
-            android:id="@+id/name_edit"
-            android:hint="姓名"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:hint="姓名"
             />
     </android.support.design.widget.TextInputLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
         <TextView
-            android:text="性别："
-            android:textSize="20dp"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:text="性别："
+            android:textSize="@dimen/info_layout_text_size"/>
+
         <RadioGroup
             android:id="@+id/sex_choose"
-            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
             <RadioButton
                 android:id="@+id/sex_choose_man"
-                android:text="男"
-                android:textSize="20dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="男"
+                android:textSize="@dimen/info_layout_text_size"/>
+
             <RadioButton
                 android:id="@+id/sex_choose_woman"
-                android:text="女"
-                android:textSize="20dp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:text="女"
+                android:textSize="@dimen/info_layout_text_size"/>
 
         </RadioGroup>
     </LinearLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:orientation="horizontal"
+        android:id="@+id/birthday_edit"
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="@dimen/info_layout_item_height">
+
         <EditText
-            android:id="@+id/birthday_edit"
-            android:hint="生日"
-            android:focusable="false"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </android.support.design.widget.TextInputLayout>
-    <RelativeLayout
-        android:visibility="gone"
-        android:id="@+id/birthday_choose"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-        <DatePicker
-            android:id="@+id/data_picker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
-        <Button
-            android:id="@+id/data_ok"
-            android:layout_alignRight="@id/data_picker"
-            android:text="选择"
-            android:textColor="#fff"
-            android:textSize="20dp"
-            android:layout_marginRight="50dp"
-            android:background="@color/colorAccent"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-    </RelativeLayout>
-
-
-    <android.support.design.widget.TextInputLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="60dp">
-        <EditText
-            android:id="@+id/add_edit"
-            android:hint="居住地"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:hint="生日"/>
     </android.support.design.widget.TextInputLayout>
 
 
     <android.support.design.widget.TextInputLayout
-        android:orientation="horizontal"
+        android:id="@+id/add_edit"
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="@dimen/info_layout_item_height">
+
         <EditText
-            android:hint="家庭关系"
-            android:id="@+id/fam_re_edit"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="居住地"/>
     </android.support.design.widget.TextInputLayout>
+
+
     <android.support.design.widget.TextInputLayout
-        android:orientation="horizontal"
+        android:id="@+id/fam_re_edit"
         android:layout_width="match_parent"
-        android:layout_height="60dp">
+        android:layout_height="@dimen/info_layout_item_height">
+
         <EditText
-            android:hint="与我的亲密关系"
-            android:id="@+id/relation_edit"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="家庭关系"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/relation_edit"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/info_layout_item_height">
+
+        <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="与我的亲密关系"/>
     </android.support.design.widget.TextInputLayout>
 
 </LinearLayout>
