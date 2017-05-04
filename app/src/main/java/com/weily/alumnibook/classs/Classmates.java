@@ -1,6 +1,8 @@
 package com.weily.alumnibook.classs;
 
-public class Classmates
+import java.io.Serializable;
+
+public class Classmates implements Serializable
 {
     private String name;
     private String class_number;
