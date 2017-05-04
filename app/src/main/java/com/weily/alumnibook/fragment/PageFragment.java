@@ -1,26 +1,35 @@
-package com.weily.alumnibook;
+package com.weily.alumnibook.fragment;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+
+import com.weily.alumnibook.App;
+import com.weily.alumnibook.R;
+import com.weily.alumnibook.adapter.ClassmatesAdapter;
+import com.weily.alumnibook.classs.Classmates;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class PageFragment extends Fragment
 {
     private static final String ARG_PARAM = "ARG_PARAM";
-    private int page;
+    private List<Classmates> list;
 
     public PageFragment()
     {
     }
 
-    public static PageFragment newInstance(int page)
+    public static PageFragment newInstance(ArrayList<Classmates> list)
     {
         Bundle args = new Bundle();
-        args.putInt(ARG_PARAM, page);
+        args.putSerializable(ARG_PARAM, list);
         PageFragment fragment = new PageFragment();
         fragment.setArguments(args);
         return fragment;
@@ -32,7 +41,7 @@ public class PageFragment extends Fragment
         super.onCreate(savedInstanceState);
         if (getArguments() != null)
         {
-            page = getArguments().getInt(ARG_PARAM);
+            this.list = (List) getArguments().getSerializable(ARG_PARAM);
         }
     }
 
@@ -41,8 +50,10 @@ public class PageFragment extends Fragment
                              Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_page, container, false);
-        TextView textView = (TextView) view.findViewById(R.id.text);
-        textView.setText("Fragment" + page);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
+        ClassmatesAdapter adapter = new ClassmatesAdapter(list,getContext());
+        recyclerView.setLayoutManager(new LinearLayoutManager(App.getContext()));
+        recyclerView.setAdapter(adapter);
         return view;
     }
 }
