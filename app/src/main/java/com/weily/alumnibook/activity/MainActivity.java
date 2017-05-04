@@ -1,4 +1,4 @@
-package com.weily.alumnibook;
+package com.weily.alumnibook.activity;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -10,6 +10,10 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import com.weily.alumnibook.ActivityMethod;
+import com.weily.alumnibook.R;
+import com.weily.alumnibook.adapter.SimpleFragmentPagerAdapter;
 
 public class MainActivity extends AppCompatActivity implements ActivityMethod
 {
@@ -36,7 +40,7 @@ public class MainActivity extends AppCompatActivity implements ActivityMethod
         viewPager = (ViewPager) findViewById(R.id.viewpager);
         tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
 
-        simpleFragmentPagerAdapter = new SimpleFragmentPagerAdapter(getSupportFragmentManager(), this);
+        simpleFragmentPagerAdapter = new SimpleFragmentPagerAdapter(getSupportFragmentManager());
         viewPager.setAdapter(simpleFragmentPagerAdapter);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setTabMode(TabLayout.MODE_FIXED);
