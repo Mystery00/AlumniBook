@@ -66,12 +66,12 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
     public void initialization()
     {
         Bundle bundle = getIntent().getBundleExtra("classmates");
+        phoneList = new ArrayList<>();
+        emailList = new ArrayList<>();
+        photoList = new ArrayList<>();
         if (bundle != null)
         {
             classmates = (Classmates) bundle.getSerializable("classmates");
-            phoneList = new ArrayList<>();
-            emailList = new ArrayList<>();
-            photoList = new ArrayList<>();
             phoneList.add("123465798");
             phoneList.add("64579123");
             emailList.add("myas@qq.com");
