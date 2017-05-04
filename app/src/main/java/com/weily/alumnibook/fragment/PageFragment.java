@@ -1,5 +1,6 @@
 package com.weily.alumnibook.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -8,19 +9,18 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
+import com.weily.alumnibook.activity.ClassmatesActivity;
 import com.weily.alumnibook.adapter.ClassmatesAdapter;
 import com.weily.alumnibook.classs.Classmates;
 
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class PageFragment extends Fragment
 {
     private static final String ARG_PARAM = "ARG_PARAM";
-    private List<Classmates> list;
+    private List<Classmates> dataList=new ArrayList<>();
 
     public PageFragment()
     {
@@ -41,7 +41,7 @@ public class PageFragment extends Fragment
         super.onCreate(savedInstanceState);
         if (getArguments() != null)
         {
-            this.list = (List) getArguments().getSerializable(ARG_PARAM);
+            dataList = (List) getArguments().getSerializable(ARG_PARAM);
         }
     }
 
@@ -50,10 +50,21 @@ public class PageFragment extends Fragment
                              Bundle savedInstanceState)
     {
         View view = inflater.inflate(R.layout.fragment_page, container, false);
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
-        ClassmatesAdapter adapter = new ClassmatesAdapter(list,getContext());
-        recyclerView.setLayoutManager(new LinearLayoutManager(App.getContext()));
-        recyclerView.setAdapter(adapter);
+        RecyclerView classmatesRecycler = (RecyclerView) view.findViewById(R.id.recycler_view);
+        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
+        classmatesRecycler.setLayoutManager(linearLayoutManager);
+        ClassmatesAdapter adapter=new ClassmatesAdapter(dataList, getContext());
+
+        adapter.setOnItemClickListener(new ClassmatesAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(Classmates classmates, int position) {
+                Intent intent=new Intent(getContext(), ClassmatesActivity.class);
+                intent.putExtra("position",position+"");
+                startActivity(intent);
+            }
+        });
+
+        classmatesRecycler.setAdapter(adapter);
         return view;
     }
 }

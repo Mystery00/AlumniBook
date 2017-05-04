@@ -16,6 +16,29 @@ public class ClassmatesAdapter extends RecyclerView.Adapter<ClassmatesAdapter.Vi
 {
     private List<Classmates> list;
     private Context context;
+    private OnItemClickListener cOnItemClickListener;
+    private OnItemLongClickListener cOnItemLongClickListener;
+
+    public interface OnItemClickListener
+    {
+        void onItemClick(Classmates classmates, int position);
+    }
+
+    public interface OnItemLongClickListener
+    {
+        void onItemLongClick(Classmates classmates, int position);
+    }
+
+
+    public void setOnItemClickListener(OnItemClickListener cOnItemClickListener)
+    {
+        this.cOnItemClickListener = cOnItemClickListener;
+    }
+
+    public void setOnItemLongClickListener(OnItemLongClickListener cOnItemClickListener)
+    {
+        this.cOnItemLongClickListener = cOnItemClickListener;
+    }
 
     public ClassmatesAdapter(List<Classmates> list, Context context)
     {
@@ -27,14 +50,41 @@ public class ClassmatesAdapter extends RecyclerView.Adapter<ClassmatesAdapter.Vi
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
         View view = LayoutInflater.from(context).inflate(R.layout.item_classmates, parent, false);
-        ViewHolder viewHolder = new ViewHolder(view);
+        final ViewHolder viewHolder = new ViewHolder(view);
+        if (cOnItemClickListener != null)
+        {
+            viewHolder.classmatesView.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View view)
+                {
+                    int position = viewHolder.getAdapterPosition();
+                    cOnItemClickListener.onItemClick(list.get(position), position);
+                }
+            });
+        }
+        if (cOnItemLongClickListener != null)
+        {
+            viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener()
+            {
+                @Override
+                public boolean onLongClick(View v)
+                {
+                    int position = viewHolder.getAdapterPosition();
+                    cOnItemLongClickListener.onItemLongClick(list.get(position), position);
+                    return true;
+                }
+            });
+        }
         return viewHolder;
     }
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position)
     {
-        holder.textView.setText(list.get(position).getName());
+        Classmates classmates = list.get(position);
+        holder.cName.setText(classmates.getName());
+//        holder.cTel.setText(classmates);
     }
 
     @Override
@@ -45,12 +95,16 @@ public class ClassmatesAdapter extends RecyclerView.Adapter<ClassmatesAdapter.Vi
 
     static class ViewHolder extends RecyclerView.ViewHolder
     {
-        TextView textView;
+        TextView cName;
+        TextView cTel;
+        View classmatesView;
 
         public ViewHolder(View itemView)
         {
             super(itemView);
-            textView = (TextView) itemView.findViewById(R.id.name);
+            classmatesView = itemView;
+            cName = (TextView) itemView.findViewById(R.id.c_name);
+            cTel = (TextView) itemView.findViewById(R.id.c_tel);
         }
     }
 }
