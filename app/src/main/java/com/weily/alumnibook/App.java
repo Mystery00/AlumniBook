@@ -13,7 +13,7 @@ public class App extends Application
     public void onCreate()
     {
         super.onCreate();
-        context=getApplicationContext();
+        context = getApplicationContext();
         Logs.setLevel(Logs.LogLevel.Debug);
     }
 

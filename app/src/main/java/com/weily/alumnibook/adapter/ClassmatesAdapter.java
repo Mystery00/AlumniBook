@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
 import com.weily.alumnibook.classs.Classmates;
 
@@ -15,7 +16,6 @@ import java.util.List;
 public class ClassmatesAdapter extends RecyclerView.Adapter<ClassmatesAdapter.ViewHolder>
 {
     private List<Classmates> list;
-    private Context context;
     private OnItemClickListener cOnItemClickListener;
     private OnItemLongClickListener cOnItemLongClickListener;
 
@@ -40,16 +40,15 @@ public class ClassmatesAdapter extends RecyclerView.Adapter<ClassmatesAdapter.Vi
         this.cOnItemLongClickListener = cOnItemClickListener;
     }
 
-    public ClassmatesAdapter(List<Classmates> list, Context context)
+    public ClassmatesAdapter(List<Classmates> list)
     {
         this.list = list;
-        this.context = context;
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType)
     {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_classmates, parent, false);
+        View view = LayoutInflater.from(App.getContext()).inflate(R.layout.item_classmates, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
         if (cOnItemClickListener != null)
         {
@@ -84,7 +83,6 @@ public class ClassmatesAdapter extends RecyclerView.Adapter<ClassmatesAdapter.Vi
     {
         Classmates classmates = list.get(position);
         holder.cName.setText(classmates.getName());
-//        holder.cTel.setText(classmates);
     }
 
     @Override
@@ -96,7 +94,6 @@ public class ClassmatesAdapter extends RecyclerView.Adapter<ClassmatesAdapter.Vi
     static class ViewHolder extends RecyclerView.ViewHolder
     {
         TextView cName;
-        TextView cTel;
         View classmatesView;
 
         public ViewHolder(View itemView)
@@ -104,7 +101,6 @@ public class ClassmatesAdapter extends RecyclerView.Adapter<ClassmatesAdapter.Vi
             super(itemView);
             classmatesView = itemView;
             cName = (TextView) itemView.findViewById(R.id.c_name);
-            cTel = (TextView) itemView.findViewById(R.id.c_tel);
         }
     }
 }

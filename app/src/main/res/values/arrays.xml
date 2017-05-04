@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="titles">
+        <item>小学同学</item>
+        <item>初中同学</item>
+        <item>高中同学</item>
+        <item>大学同学</item>
+        <item>其他同学</item>
+    </string-array>
+</resources>

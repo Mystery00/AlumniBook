@@ -20,7 +20,7 @@ import java.util.List;
 public class PageFragment extends Fragment
 {
     private static final String ARG_PARAM = "ARG_PARAM";
-    private List<Classmates> dataList=new ArrayList<>();
+    private List<Classmates> dataList = new ArrayList<>();
 
     public PageFragment()
     {
@@ -51,15 +51,19 @@ public class PageFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.fragment_page, container, false);
         RecyclerView classmatesRecycler = (RecyclerView) view.findViewById(R.id.recycler_view);
-        LinearLayoutManager linearLayoutManager=new LinearLayoutManager(getContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         classmatesRecycler.setLayoutManager(linearLayoutManager);
-        ClassmatesAdapter adapter=new ClassmatesAdapter(dataList, getContext());
+        ClassmatesAdapter adapter = new ClassmatesAdapter(dataList);
 
-        adapter.setOnItemClickListener(new ClassmatesAdapter.OnItemClickListener() {
+        adapter.setOnItemClickListener(new ClassmatesAdapter.OnItemClickListener()
+        {
             @Override
-            public void onItemClick(Classmates classmates, int position) {
-                Intent intent=new Intent(getContext(), ClassmatesActivity.class);
-                intent.putExtra("position",position+"");
+            public void onItemClick(Classmates classmates, int position)
+            {
+                Intent intent = new Intent(getContext(), ClassmatesActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("classmates", classmates);
+                intent.putExtra("classmates", new Bundle(bundle));
                 startActivity(intent);
             }
         });
