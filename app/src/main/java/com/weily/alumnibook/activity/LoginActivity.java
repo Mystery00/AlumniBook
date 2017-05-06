@@ -5,25 +5,26 @@ import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.mystery0.tools.Logs.Logs;
+import com.mystery0.tools.MysteryNetFrameWork.HttpUtil;
+import com.mystery0.tools.MysteryNetFrameWork.ResponseListener;
+import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
-import com.weily.alumnibook.util.HttpUtil;
-import com.weily.alumnibook.util.Utility;
+import com.weily.alumnibook.classs.Response;
 
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Response;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener
 {
+    private static final String TAG = "LoginActivity";
     private String responseText;
     private String result[];
     private ProgressDialog progressDialog;
@@ -58,7 +59,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 {
                     //提交登录信息
                     postLoginInfo();
-
                 }
                 break;
             case R.id.register:
@@ -74,52 +74,81 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         showProgressDialog();
         loginUserName = lun.getText().toString();
         loginPassowrd = lpw.getText().toString();
-        HttpUtil.sendInfo("http://123.206.186.70/php/alumnibook/login.php", loginUserName, loginPassowrd, new Callback()
-        {
-            @Override
-            public void onFailure(Call call, IOException e)
-            {
-                LoginActivity.this.runOnUiThread(new Runnable()
+        Map<String, String> map = new HashMap<>();
+        map.put("username", loginUserName);
+        map.put("password", loginPassowrd);
+        map.put("method", "sign_in");
+        new HttpUtil(App.getContext())
+                .setUrl("http://www.mystery0.vip/php/alumnibook/alumnibook.php")
+                .setRequestMethod(HttpUtil.RequestMethod.POST)
+                .setMap(map)
+                .setResponseListener(new ResponseListener()
                 {
                     @Override
-                    public void run()
+                    public void onResponse(int i, String s)
                     {
                         closeProgressDialog();
-                        Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException
-            {
-                closeProgressDialog();
-                responseText = response.body().string();
-                LoginActivity.this.runOnUiThread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        //解析返回信息,dayin
-                        Utility.handleLoginReturnInfo(responseText);
-
-                        Log.i("------", Utility.code2);
-                        //判断执行下一步动作
-                        if (Utility.code2.equals("1"))
+                        Logs.i(TAG, "onResponse: " + i + " " + s);
+                        Response response = new Gson().fromJson(s, Response.class);
+                        if (response.getCode() == 0)
                         {
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                             startActivity(intent);
                             finish();
                         } else
                         {
-                            Toast.makeText(LoginActivity.this, "账号或密码错误", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(App.getContext(), response.getContent(), Toast.LENGTH_SHORT)
+                                    .show();
                         }
                     }
-                });
-
-
-            }
-        });
+                })
+                .open();
+//        HttpUtil.sendInfo("http://123.206.186.70/php/alumnibook/alumnibook.php", loginUserName, loginPassowrd, new Callback()
+//        {
+//            @Override
+//            public void onFailure(Call call, IOException e)
+//            {
+//                LoginActivity.this.runOnUiThread(new Runnable()
+//                {
+//                    @Override
+//                    public void run()
+//                    {
+//                        closeProgressDialog();
+//                        Toast.makeText(LoginActivity.this, "登录失败", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//            }
+//
+//            @Override
+//            public void onResponse(Call call, Response response) throws IOException
+//            {
+//                closeProgressDialog();
+//                responseText = response.body().string();
+//                LoginActivity.this.runOnUiThread(new Runnable()
+//                {
+//                    @Override
+//                    public void run()
+//                    {
+//                        //解析返回信息,dayin
+//                        Utility.handleLoginReturnInfo(responseText);
+//
+//                        Log.i("------", Utility.code2);
+//                        //判断执行下一步动作
+//                        if (Utility.code2.equals("1"))
+//                        {
+//                            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//                            startActivity(intent);
+//                            finish();
+//                        } else
+//                        {
+//                            Toast.makeText(LoginActivity.this, "账号或密码错误", Toast.LENGTH_SHORT).show();
+//                        }
+//                    }
+//                });
+//
+//
+//            }
+//        });
     }
 
     private void handleLoginReturnInfo()
@@ -133,6 +162,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         {
             progressDialog = new ProgressDialog(LoginActivity.this);
             progressDialog.setMessage("正在登录");
+            progressDialog.setCancelable(false);
             progressDialog.setCanceledOnTouchOutside(false);
         }
         progressDialog.show();

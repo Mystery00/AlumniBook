@@ -3,6 +3,7 @@ package com.weily.alumnibook.activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,7 +27,6 @@ import java.util.List;
 
 public class ClassmatesActivity extends AppCompatActivity implements ActivityMethod
 {
-    private Classmates classmates;
     private TextInputLayout name;
     private TextInputLayout birthday;
     private TextInputLayout address;
@@ -35,20 +35,17 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
     private RadioGroup sex;
     private TextInputLayout ps;
     private TextInputLayout scandal;
-
     private RecyclerView phoneRecycler;
     private RecyclerView emailRecycler;
     private RecyclerView photoRecycler;
-
     private RadioButton manChoose;
     private RadioButton womanChoose;
-
     private Button addTel;
     private Button addEmail;
-
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private Classmates classmates;
     private Phone phone;
     private Email email;
-
     private List<String> phoneList;
     private List<String> emailList;
     private List<String> photoList;
@@ -86,6 +83,7 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
         }
         setContentView(R.layout.activity_classmates);
 
+        swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         name = (TextInputLayout) findViewById(R.id.name_edit);
         birthday = (TextInputLayout) findViewById(R.id.birthday_edit);
         address = (TextInputLayout) findViewById(R.id.add_edit);
@@ -131,12 +129,25 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
 
         photoRecycler.setLayoutManager(new LinearLayoutManager(App.getContext(), LinearLayoutManager.HORIZONTAL, false));
         photoRecycler.setAdapter(photoAdapter);
+
+        swipeRefreshLayout.setColorSchemeResources(
+                android.R.color.white,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
     }
 
     @Override
     public void monitor()
     {
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
+        {
+            @Override
+            public void onRefresh()
+            {
 
+            }
+        });
     }
 
     @Override
