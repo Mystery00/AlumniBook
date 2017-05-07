@@ -18,8 +18,8 @@
 
             <include layout="@layout/tele_layout"/>
 
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/photo_recycler"
+            <com.mystery0.tools.PictureChooser.iPictureChooser
+                android:id="@+id/picture_chooser"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"/>
 

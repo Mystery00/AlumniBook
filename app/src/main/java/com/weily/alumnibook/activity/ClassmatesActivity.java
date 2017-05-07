@@ -1,5 +1,6 @@
 package com.weily.alumnibook.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
@@ -13,11 +14,12 @@ import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
+import com.mystery0.tools.PictureChooser.iPictureChooser;
+import com.mystery0.tools.PictureChooser.iPictureChooserListener;
 import com.weily.alumnibook.ActivityMethod;
 import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
 import com.weily.alumnibook.adapter.PhoneEmailAdapter;
-import com.weily.alumnibook.adapter.PhotoAdapter;
 import com.weily.alumnibook.classs.Classmates;
 import com.weily.alumnibook.classs.Email;
 import com.weily.alumnibook.classs.Phone;
@@ -37,7 +39,7 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
     private TextInputLayout scandal;
     private RecyclerView phoneRecycler;
     private RecyclerView emailRecycler;
-    private RecyclerView photoRecycler;
+    private iPictureChooser pictureChooser;
     private RadioButton manChoose;
     private RadioButton womanChoose;
     private Button addTel;
@@ -93,7 +95,7 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
         sex = (RadioGroup) findViewById(R.id.sex_choose);
         phoneRecycler = (RecyclerView) findViewById(R.id.tel_recycler);
         emailRecycler = (RecyclerView) findViewById(R.id.email_recycler);
-        photoRecycler = (RecyclerView) findViewById(R.id.photo_recycler);
+        pictureChooser = (iPictureChooser) findViewById(R.id.picture_chooser);
         ps = (TextInputLayout) findViewById(R.id.other_edit);
         manChoose = (RadioButton) findViewById(R.id.sex_choose_man);
         womanChoose = (RadioButton) findViewById(R.id.sex_choose_woman);
@@ -119,7 +121,6 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
         }
         PhoneEmailAdapter phoneAdapter = new PhoneEmailAdapter(phoneList);
         PhoneEmailAdapter emailAdapter = new PhoneEmailAdapter(emailList);
-        PhotoAdapter photoAdapter = new PhotoAdapter(photoList);
 
         phoneRecycler.setLayoutManager(new LinearLayoutManager(App.getContext()));
         phoneRecycler.setAdapter(phoneAdapter);
@@ -127,11 +128,8 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
         emailRecycler.setLayoutManager(new LinearLayoutManager(App.getContext()));
         emailRecycler.setAdapter(emailAdapter);
 
-        photoRecycler.setLayoutManager(new LinearLayoutManager(App.getContext(), LinearLayoutManager.HORIZONTAL, false));
-        photoRecycler.setAdapter(photoAdapter);
-
         swipeRefreshLayout.setColorSchemeResources(
-                android.R.color.white,
+                android.R.color.holo_blue_light,
                 android.R.color.holo_green_light,
                 android.R.color.holo_orange_light,
                 android.R.color.holo_red_light);
@@ -140,6 +138,17 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
     @Override
     public void monitor()
     {
+        pictureChooser.setDataList(R.drawable.ic_picture_chooser, new iPictureChooserListener()
+        {
+            @Override
+            public void MainClick()
+            {
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/*");
+                startActivityForResult(intent, iPictureChooser.REQUEST_IMG_CHOOSE);
+            }
+        });
+        pictureChooser.setList(photoList);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
         {
             @Override
@@ -163,5 +172,17 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
     {
         int id = item.getItemId();
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == iPictureChooser.REQUEST_IMG_CHOOSE)
+        {
+            if (data != null)
+            {
+                pictureChooser.setUpdatedPicture(data.getData());
+            }
+        }
     }
 }
