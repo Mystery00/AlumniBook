@@ -21,8 +21,6 @@ import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
 import com.weily.alumnibook.adapter.PhoneEmailAdapter;
 import com.weily.alumnibook.classs.Classmates;
-import com.weily.alumnibook.classs.Email;
-import com.weily.alumnibook.classs.Phone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,8 +44,6 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
     private Button addEmail;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Classmates classmates;
-    private Phone phone;
-    private Email email;
     private List<String> phoneList;
     private List<String> emailList;
     private List<String> photoList;
@@ -154,7 +150,7 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
             @Override
             public void onRefresh()
             {
-
+                swipeRefreshLayout.setRefreshing(false);
             }
         });
     }

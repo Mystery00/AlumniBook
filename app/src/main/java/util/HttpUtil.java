@@ -10,7 +10,7 @@ public class HttpUtil {
 
     public static void sendInfo(String address,String username,String password,String method,okhttp3.Callback callback){
         OkHttpClient client=new OkHttpClient();
-        RequestBody requestBody=new FormBody.Builder().add("username",username).add("password",password).add("method",method).build();
+        RequestBody requestBody=new FormBody.Builder().add("userType","user").add("username",username).add("password",password).add("method",method).build();
         Request request=new Request.Builder().url(address).post(requestBody).build();
         client.newCall(request).enqueue(callback);
     }

@@ -32,6 +32,12 @@
         <activity
             android:name=".activity.RegisterActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".activity.MyActivity"/>
+        <activity
+            android:name=".activity.SendActivity"/>
+        <activity
+            android:name=".activity.ActivityShowActivity"/>
     </application>
 
 </manifest>
