@@ -2,6 +2,7 @@ package com.weily.alumnibook.activity;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -93,6 +94,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                             Response response = new Gson().fromJson(s, Response.class);
                             if (response.getCode() == 0)
                             {
+                                SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                editor.putString("username", loginUserName);
+                                editor.putString("password", loginPassowrd);
+                                editor.apply();
                                 Intent intent = new Intent(LoginActivity.this, MainActivity.class);
                                 startActivity(intent);
                                 finish();

@@ -2,8 +2,12 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.weily.alumnibook.activity.MainActivity">
-    <item android:id="@+id/action_settings"
-          android:orderInCategory="100"
-          android:title="@string/action_settings"
-          app:showAsAction="never"/>
+    <item
+        android:id="@+id/re_load"
+        android:title="注销账号"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/exit"
+        android:title="退出"
+        app:showAsAction="never"/>
 </menu>

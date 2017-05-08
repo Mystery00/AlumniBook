@@ -12,14 +12,15 @@ import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
 import com.weily.alumnibook.activity.ClassmatesActivity;
 import com.weily.alumnibook.classs.Classmates;
+import com.weily.alumnibook.classs.Teacher;
 
 import java.util.List;
 
-public class ClassmatesAdapter extends RecyclerView.Adapter<ClassmatesAdapter.ViewHolder>
+public class TeacherAdapter extends RecyclerView.Adapter<TeacherAdapter.ViewHolder>
 {
-    private List<Classmates> list;
+    private List<Teacher> list;
 
-    public ClassmatesAdapter(List<Classmates> list)
+    public TeacherAdapter(List<Teacher> list)
     {
         this.list = list;
     }
@@ -29,15 +30,15 @@ public class ClassmatesAdapter extends RecyclerView.Adapter<ClassmatesAdapter.Vi
     {
         View view = LayoutInflater.from(App.getContext()).inflate(R.layout.item_classmates, parent, false);
         final ViewHolder viewHolder = new ViewHolder(view);
-        viewHolder.classmatesView.setOnClickListener(new View.OnClickListener()
+        viewHolder.teacherView.setOnClickListener(new View.OnClickListener()
         {
             @Override
             public void onClick(View view)
             {
                 Intent intent = new Intent(App.getContext(), ClassmatesActivity.class);
                 Bundle bundle = new Bundle();
-                bundle.putSerializable("classmates", list.get(viewHolder.getAdapterPosition()));
-                intent.putExtra("classmates", new Bundle(bundle));
+                bundle.putSerializable("teacher", list.get(viewHolder.getAdapterPosition()));
+                intent.putExtra("teacher", new Bundle(bundle));
                 App.getContext().startActivity(intent);
             }
         });
@@ -47,8 +48,8 @@ public class ClassmatesAdapter extends RecyclerView.Adapter<ClassmatesAdapter.Vi
     @Override
     public void onBindViewHolder(ViewHolder holder, int position)
     {
-        Classmates classmates = list.get(position);
-        holder.cName.setText(classmates.getName());
+        Teacher teacher = list.get(position);
+        holder.cName.setText(teacher.getName());
     }
 
     @Override
@@ -60,12 +61,12 @@ public class ClassmatesAdapter extends RecyclerView.Adapter<ClassmatesAdapter.Vi
     static class ViewHolder extends RecyclerView.ViewHolder
     {
         TextView cName;
-        View classmatesView;
+        View teacherView;
 
         public ViewHolder(View itemView)
         {
             super(itemView);
-            classmatesView = itemView;
+            teacherView = itemView;
             cName = (TextView) itemView.findViewById(R.id.c_name);
         }
     }

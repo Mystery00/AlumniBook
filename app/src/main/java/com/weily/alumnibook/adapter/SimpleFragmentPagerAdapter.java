@@ -1,61 +1,51 @@
 package com.weily.alumnibook.adapter;
 
-import android.content.Context;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
-import com.weily.alumnibook.classs.Classmates;
+import com.weily.alumnibook.App;
+import com.weily.alumnibook.R;
 import com.weily.alumnibook.fragment.PageFragment;
-
-import java.util.ArrayList;
 
 public class SimpleFragmentPagerAdapter extends FragmentPagerAdapter
 {
-    final int PAGE_COUNT = 5;
-    private String tabTitles[] = new String[]{"小学同学", "初中同学", "高中同学", "大学同学", "其他"};
-    private Context context;
+    private String type;
 
-
-    public SimpleFragmentPagerAdapter(FragmentManager fm, Context context)
+    public SimpleFragmentPagerAdapter(FragmentManager fm, String type)
     {
         super(fm);
-        this.context = context;
+        this.type = type;
     }
 
     @Override
     public Fragment getItem(int position)
     {
-        ArrayList<Classmates> classmates = new ArrayList<>();
-        switch (position)
-        {
-            case 0:
-                break;
-            case 1:
-                break;
-            case 2:
-                break;
-            case 3:
-                break;
-            case 4:
-                break;
-        }
-        return PageFragment.newInstance(classmates);
+        return PageFragment.newInstance(type, position + 1);
     }
 
     @Override
     public int getCount()
     {
-        return PAGE_COUNT;
-    }
-
-    public void setTabTitles(String[] tabTitles) {
-        this.tabTitles = tabTitles;
+        return 5;
     }
 
     @Override
     public CharSequence getPageTitle(int position)
     {
+        String[] tabTitles;
+        switch (type)
+        {
+            case "student":
+                tabTitles = App.getContext().getResources().getStringArray(R.array.student_titles);
+                break;
+            case "teacher":
+                tabTitles = App.getContext().getResources().getStringArray(R.array.teacher_titles);
+                break;
+            default:
+                tabTitles = new String[0];
+                break;
+        }
         return tabTitles[position];
     }
 

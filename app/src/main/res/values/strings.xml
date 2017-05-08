@@ -6,4 +6,5 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
     <string name="request_url">http://www.mystery0.vip/php/alumnibook/alumnibook.php</string>
+    <string name="shared_preference_name">login</string>
 </resources>

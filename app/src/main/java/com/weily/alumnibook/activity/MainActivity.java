@@ -13,22 +13,21 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 
 import com.weily.alumnibook.ActivityMethod;
 import com.weily.alumnibook.R;
 import com.weily.alumnibook.adapter.SimpleFragmentPagerAdapter;
-import com.weily.alumnibook.fragment.PageFragment;
 
 public class MainActivity extends AppCompatActivity implements ActivityMethod
 {
     private DrawerLayout drawerLayout;
-    private NavigationView navigationView;
-    private Toolbar toolbar;
     private FloatingActionButton fab;
-    private SimpleFragmentPagerAdapter simpleFragmentPagerAdapter;
-    private ViewPager viewPager;
-    private TabLayout tabLayout;
-    private String showType = "student";
+    private SimpleFragmentPagerAdapter studentAdapter;
+    private SimpleFragmentPagerAdapter teacherAdapter;
+    private LinearLayout student_layout, teacher_layout;
+    private ViewPager student_viewPager, teacher_viewPager;
+    private TabLayout student_tabLayout, teacher_tabLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -42,17 +41,26 @@ public class MainActivity extends AppCompatActivity implements ActivityMethod
     public void initialization()
     {
         setContentView(R.layout.activity_main);
-        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         fab = (FloatingActionButton) findViewById(R.id.fab);
-        viewPager = (ViewPager) findViewById(R.id.viewpager);
-        tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
-        drawerLayout= (DrawerLayout) findViewById(R.id.drawer_layout);
-        navigationView= (NavigationView) findViewById(R.id.nav_view);
+        student_layout = (LinearLayout) findViewById(R.id.student_layout);
+        student_viewPager = (ViewPager) findViewById(R.id.student_viewpager);
+        student_tabLayout = (TabLayout) findViewById(R.id.student_sliding_tabs);
+        teacher_layout = (LinearLayout) findViewById(R.id.teacher_layout);
+        teacher_viewPager = (ViewPager) findViewById(R.id.teacher_viewpager);
+        teacher_tabLayout = (TabLayout) findViewById(R.id.teacher_sliding_tabs);
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
 
-        simpleFragmentPagerAdapter = new SimpleFragmentPagerAdapter(getSupportFragmentManager(), this);
-        viewPager.setAdapter(simpleFragmentPagerAdapter);
-        tabLayout.setupWithViewPager(viewPager);
-        tabLayout.setTabMode(TabLayout.MODE_FIXED);
+        studentAdapter = new SimpleFragmentPagerAdapter(getSupportFragmentManager(), "student");
+        student_viewPager.setAdapter(studentAdapter);
+        student_tabLayout.setupWithViewPager(student_viewPager);
+        student_tabLayout.setTabMode(TabLayout.MODE_FIXED);
+
+        teacherAdapter = new SimpleFragmentPagerAdapter(getSupportFragmentManager(), "teacher");
+        teacher_viewPager.setAdapter(teacherAdapter);
+        teacher_tabLayout.setupWithViewPager(teacher_viewPager);
+        teacher_tabLayout.setTabMode(TabLayout.MODE_FIXED);
 
         navigationView.setCheckedItem(R.id.nav_classmates);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener()
@@ -64,30 +72,21 @@ public class MainActivity extends AppCompatActivity implements ActivityMethod
                 switch (item.getItemId())
                 {
                     case R.id.nav_teacher:
-                        showType = "teacher";
-                        Bundle bundle = new Bundle();
-                        bundle.putSerializable("showType", showType);
-                        PageFragment pageFragment = new PageFragment();
-                        pageFragment.setArguments(bundle);
-
-                        simpleFragmentPagerAdapter.setTabTitles(new String[]{"小学老师", "初中老师", "高中老师", "大学老师", "其他"});
-                        viewPager.setAdapter(simpleFragmentPagerAdapter);
+                        student_layout.setVisibility(View.GONE);
+                        teacher_layout.setVisibility(View.VISIBLE);
                         break;
                     case R.id.nav_classmates:
-                        showType = "student";
-                        simpleFragmentPagerAdapter.setTabTitles(new String[]{"小学同学", "初中同学", "高中同学", "大学同学", "其他"});
-                        viewPager.setAdapter(simpleFragmentPagerAdapter);
+                        student_layout.setVisibility(View.VISIBLE);
+                        teacher_layout.setVisibility(View.GONE);
                         break;
                     case R.id.nav_activity:
                         Intent intent = new Intent(getApplicationContext(), MyActivity.class);
                         startActivity(intent);
                         break;
                 }
-
                 return true;
             }
         });
-
         setSupportActionBar(toolbar);
     }
 
@@ -116,11 +115,6 @@ public class MainActivity extends AppCompatActivity implements ActivityMethod
     public boolean onOptionsItemSelected(MenuItem item)
     {
         int id = item.getItemId();
-
-        if (id == R.id.action_settings)
-        {
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
     }
