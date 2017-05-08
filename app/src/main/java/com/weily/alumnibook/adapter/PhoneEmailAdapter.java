@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.weily.alumnibook.App;
@@ -71,13 +72,13 @@ public class PhoneEmailAdapter extends RecyclerView.Adapter<PhoneEmailAdapter.Vi
     static class ViewHolder extends RecyclerView.ViewHolder
     {
         TextView textView;
-        Button btn_delete;
+        ImageButton btn_delete;
 
         public ViewHolder(View itemView)
         {
             super(itemView);
             textView = (TextView) itemView.findViewById(R.id.email_phone);
-            btn_delete = (Button) itemView.findViewById(R.id.delete);
+            btn_delete = (ImageButton) itemView.findViewById(R.id.delete);
         }
     }
 }

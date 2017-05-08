@@ -2,14 +2,14 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/picture"
-        android:title="图片"
-        app:showAsAction="always"
-        />
-    <item
         android:id="@+id/edit"
+        android:icon="@drawable/ic_edit"
         android:title="编辑"
-        app:showAsAction="always"
-        />
-
+        app:showAsAction="ifRoom"/>
+    <item
+        android:id="@+id/done"
+        android:icon="@drawable/ic_done"
+        android:title="完成"
+        android:visible="false"
+        app:showAsAction="ifRoom"/>
 </menu>

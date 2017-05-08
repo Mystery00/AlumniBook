@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -37,6 +38,7 @@ public class PageFragment extends Fragment
     private static final int HANDLER_STUDENT = 111;
     private static final int HANDLER_TEACHER = 222;
     private RecyclerView classmatesRecycler;
+    private SwipeRefreshLayout swipeRefreshLayout;
     private RecyclerView.Adapter adapter;
     private List dataList = new ArrayList();
     private String type;//请求数据类型
@@ -52,19 +54,32 @@ public class PageFragment extends Fragment
             switch (msg.what)
             {
                 case HANDLER_STUDENT:
-                    User user = new Gson().fromJson((String) msg.obj, User.class);
                     dataList.clear();
-                    dataList.addAll(Arrays.asList(user.getClassmates()).subList(0, user.getNumber()));
+                    try
+                    {
+                        User user = new Gson().fromJson((String) msg.obj, User.class);
+                        dataList.addAll(Arrays.asList(user.getClassmates()).subList(0, user.getNumber()));
+                    } catch (Exception e)
+                    {
+                        Logs.e(TAG, "handleMessage: " + e.getMessage());
+                    }
                     adapter = new ClassmatesAdapter(dataList);
                     break;
                 case HANDLER_TEACHER:
-                    Teachers teachers = new Gson().fromJson((String) msg.obj, Teachers.class);
                     dataList.clear();
-                    dataList.addAll(Arrays.asList(teachers.getTeachers()).subList(0, teachers.getNumber()));
+                    try
+                    {
+                        Teachers teachers = new Gson().fromJson((String) msg.obj, Teachers.class);
+                        dataList.addAll(Arrays.asList(teachers.getTeachers()).subList(0, teachers.getNumber()));
+                    } catch (Exception e)
+                    {
+                        Logs.e(TAG, "handleMessage: " + e.getMessage());
+                    }
                     adapter = new TeacherAdapter(dataList);
                     break;
             }
             classmatesRecycler.setAdapter(adapter);
+            swipeRefreshLayout.setRefreshing(false);
         }
     };
 
@@ -100,16 +115,31 @@ public class PageFragment extends Fragment
     {
         View view = inflater.inflate(R.layout.fragment_page, container, false);
         classmatesRecycler = (RecyclerView) view.findViewById(R.id.recycler_view);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
+        swipeRefreshLayout.setColorSchemeResources(
+                android.R.color.holo_blue_light,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+        swipeRefreshLayout.setRefreshing(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
         classmatesRecycler.setLayoutManager(linearLayoutManager);
         postRequest(type, position);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener()
+        {
+            @Override
+            public void onRefresh()
+            {
+                postRequest(type, position);
+            }
+        });
         return view;
     }
 
     private void postRequest(final String type, int dataType)
     {
         Map<String, String> map = new HashMap<>();
-        map.put("username", App.getContext().getSharedPreferences(App.getContext().getString(R.string.shared_preference_name), Context.MODE_PRIVATE).getString("username", "asd"));
+        map.put("username", App.getContext().getSharedPreferences(App.getContext().getString(R.string.shared_preference_name), Context.MODE_PRIVATE).getString("username", "test"));
         switch (type)
         {
             case "student":

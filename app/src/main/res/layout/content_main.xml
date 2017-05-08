@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.weily.alumnibook.activity.MainActivity"
-    tools:showIn="@layout/activity_main"
-    app:layout_behavior="@string/appbar_scrolling_view_behavior">
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:showIn="@layout/activity_main">
 
     <LinearLayout
         android:id="@+id/student_layout"
@@ -30,10 +30,10 @@
 
     <LinearLayout
         android:id="@+id/teacher_layout"
+        android:visibility="gone"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:orientation="vertical">
 
         <android.support.design.widget.TabLayout
             android:id="@+id/teacher_sliding_tabs"
