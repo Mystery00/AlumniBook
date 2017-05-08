@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
@@ -16,7 +15,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.weily.alumnibook.ActivityMethod;
-import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
 import com.weily.alumnibook.adapter.SimpleFragmentPagerAdapter;
 import com.weily.alumnibook.fragment.PageFragment;
