@@ -29,7 +29,9 @@
             </intent-filter>
         </activity>
         <activity android:name=".activity.ClassmatesActivity"/>
-        <activity android:name=".activity.RegisterActivity"/>
+        <activity
+            android:name=".activity.RegisterActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 
 </manifest>

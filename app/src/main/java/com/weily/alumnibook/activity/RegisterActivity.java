@@ -80,6 +80,7 @@ public class RegisterActivity extends AppCompatActivity {
                             intent.putExtra("username",registerName);
                             intent.putExtra("password",registerPassword1);
                             startActivity(intent);
+                            finish();
                         }else {
                             Toast.makeText(RegisterActivity.this, Utility.resultContent, Toast.LENGTH_SHORT).show();
                         }
