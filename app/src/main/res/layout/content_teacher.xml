@@ -7,7 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:showIn="@layout/activity_classmates">
+    tools:showIn="@layout/activity_teacher">
 
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
@@ -24,7 +24,7 @@
                 android:id="@+id/spinner"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:entries="@array/student_titles"/>
+                android:entries="@array/teacher_titles"/>
 
             <include layout="@layout/tele_layout"/>
 

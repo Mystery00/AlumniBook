@@ -32,8 +32,8 @@ import com.weily.alumnibook.ActivityMethod;
 import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
 import com.weily.alumnibook.adapter.PhoneEmailAdapter;
-import com.weily.alumnibook.classs.Classmates;
 import com.weily.alumnibook.classs.Response;
+import com.weily.alumnibook.classs.Teacher;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -42,7 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 @SuppressWarnings("ConstantConditions")
-public class ClassmatesActivity extends AppCompatActivity implements ActivityMethod
+public class TeacherActivity extends AppCompatActivity implements ActivityMethod
 {
     private static final String TAG = "ClassmatesActivity";
     private Toolbar toolbar;
@@ -85,35 +85,35 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
     @Override
     public void initialization()
     {
-        Bundle bundle = getIntent().getBundleExtra("classmates");
+        Bundle bundle = getIntent().getBundleExtra("teacher");
         phoneList = new ArrayList<>();
         emailList = new ArrayList<>();
         photoList = new ArrayList<>();
-        Classmates classmates;
+        Teacher teacher;
         if (bundle != null)
         {
             isNew = false;
-            classmates = (Classmates) bundle.getSerializable("classmates");
-            for (String temp : classmates.getPhoneList().split("!"))
+            teacher = (Teacher) bundle.getSerializable("teacher");
+            for (String temp : teacher.getPhoneList().split("!"))
             {
                 if (!temp.equals(""))
                     phoneList.add(temp);
             }
-            for (String temp : classmates.getEmailList().split("!"))
+            for (String temp : teacher.getEmailList().split("!"))
             {
                 if (!temp.equals(""))
                     emailList.add(temp);
             }
-            date = classmates.getBirthday();
+            date = teacher.getBirthday();
             photoList.add("http://ww2.sinaimg.cn/orj480/76da98c1gw1f5yhzht65hj20qo1bfgul.jpg");
             photoList.add("http://ww2.sinaimg.cn/orj480/76da98c1gw1f5yhzht65hj20qo1bfgul.jpg");
             photoList.add("http://i0.hdslb.com/bfs/archive/7c83ebda27b6e2c6fc6670f08aec28bd224da69c.jpg");
             photoList.add("http://p1.music.126.net/fUVCts6yu0k2QkXjVAfsjw==/18771962022655227.jpg");
         } else
         {
-            classmates = new Classmates();
+            teacher = new Teacher();
         }
-        setContentView(R.layout.activity_classmates);
+        setContentView(R.layout.activity_teacher);
 
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
@@ -138,17 +138,18 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
         addTel = (ImageButton) findViewById(R.id.tel_add);
         addEmail = (ImageButton) findViewById(R.id.email_add);
 
-        name.getEditText().setText(classmates.getName());
-        class_edit.getEditText().setText(classmates.getSchoolClass());
-        number_edit.getEditText().setText(classmates.getSchoolNumber());
-        work_edit.getEditText().setText(classmates.getWork());
+        name.getEditText().setText(teacher.getName());
+        class_edit.getEditText().setText(teacher.getSubject());
+        class_edit.getEditText().setHint("科目");
+        number_edit.setVisibility(View.GONE);
+        work_edit.setVisibility(View.GONE);
         birthday.setText("生日：" + date);
-        address.getEditText().setText(classmates.getAddress());
-        fRelationship.getEditText().setText(classmates.getHome());
-        relationshipWithMe.getEditText().setText(classmates.getWithMe());
-        scandal.getEditText().setText(classmates.getEmbarrassing());
-        ps.getEditText().setText(classmates.getRemark());
-        switch (classmates.getSex())
+        address.getEditText().setText(teacher.getAddress());
+        fRelationship.setVisibility(View.GONE);
+        relationshipWithMe.setVisibility(View.GONE);
+        scandal.setVisibility(View.GONE);
+        ps.getEditText().setText(teacher.getRemark());
+        switch (teacher.getSex())
         {
             case 0://男
                 sex.check(R.id.sex_choose_man);
@@ -157,7 +158,7 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                 sex.check(R.id.sex_choose_woman);
                 break;
         }
-        spinner.setSelection(classmates.getType() - 1);
+        spinner.setSelection(teacher.getType() - 1);
         phoneAdapter = new PhoneEmailAdapter(phoneList);
         emailAdapter = new PhoneEmailAdapter(emailList);
 
@@ -256,9 +257,9 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                     Calendar calendar = Calendar.getInstance();
                     dates = new String[]{String.valueOf(calendar.get(Calendar.YEAR)), String.valueOf(calendar.get(Calendar.MONTH)), String.valueOf(calendar.get(Calendar.DATE))};
                 }
-                final DatePicker datePicker = new DatePicker(ClassmatesActivity.this);
+                final DatePicker datePicker = new DatePicker(TeacherActivity.this);
                 datePicker.init(Integer.parseInt(dates[0]), Integer.parseInt(dates[1]), Integer.parseInt(dates[2]), null);
-                new AlertDialog.Builder(ClassmatesActivity.this)
+                new AlertDialog.Builder(TeacherActivity.this)
                         .setView(datePicker)
                         .setNegativeButton("取消", null)
                         .setPositiveButton("确定", new DialogInterface.OnClickListener()
@@ -292,24 +293,19 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
         switch (item.getItemId())
         {
             case R.id.done:
-                final ProgressDialog progressDialog = new ProgressDialog(ClassmatesActivity.this);
+                final ProgressDialog progressDialog = new ProgressDialog(TeacherActivity.this);
                 progressDialog.setCancelable(false);
                 progressDialog.setMessage("数据上传中……");
                 progressDialog.show();
                 Map<String, String> map = new HashMap<>();
-                map.put("userType", "student");
+                map.put("userType", "teacher");
                 map.put("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"));
-                map.put("method", "updateStudent");
+                map.put("method", "updateTeacher");
+                map.put("subject", class_edit.getEditText().getText().toString());
                 map.put("name", name.getEditText().getText().toString());
-                map.put("schoolClass", class_edit.getEditText().getText().toString());
-                map.put("schoolNumber", number_edit.getEditText().getText().toString());
                 map.put("sex", sex.getCheckedRadioButtonId() == R.id.sex_choose_man ? "0" : "1");
                 map.put("birthday", date);
                 map.put("address", address.getEditText().getText().toString());
-                map.put("work", work_edit.getEditText().getText().toString());
-                map.put("home", fRelationship.getEditText().getText().toString());
-                map.put("withMe", relationshipWithMe.getEditText().getText().toString());
-                map.put("embarrassing", scandal.getEditText().getText().toString());
                 map.put("remark", ps.getEditText().getText().toString());
                 map.put("type", String.valueOf(spinner.getSelectedItemPosition() + 1));
                 StringBuilder phoneListString = new StringBuilder();

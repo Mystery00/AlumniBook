@@ -18,6 +18,10 @@
             android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+            android:name=".activity.LoginActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -25,21 +29,18 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.LoginActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
-        <activity
             android:name=".activity.ClassmatesActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".activity.RegisterActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".activity.MyActivity"/>
+        <activity android:name=".activity.SendActivity"/>
+        <activity android:name=".activity.ActivityShowActivity"/>
         <activity
-            android:name=".activity.MyActivity"/>
-        <activity
-            android:name=".activity.SendActivity"/>
-        <activity
-            android:name=".activity.ActivityShowActivity"/>
+            android:name=".activity.TeacherActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
     </application>
 
 </manifest>

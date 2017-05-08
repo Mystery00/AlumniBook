@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
 import com.weily.alumnibook.activity.ClassmatesActivity;
+import com.weily.alumnibook.activity.TeacherActivity;
 import com.weily.alumnibook.classs.Classmates;
 import com.weily.alumnibook.classs.Teacher;
 
@@ -35,7 +36,7 @@ public class TeacherAdapter extends RecyclerView.Adapter<TeacherAdapter.ViewHold
             @Override
             public void onClick(View view)
             {
-                Intent intent = new Intent(App.getContext(), ClassmatesActivity.class);
+                Intent intent = new Intent(App.getContext(), TeacherActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("teacher", list.get(viewHolder.getAdapterPosition()));
                 intent.putExtra("teacher", new Bundle(bundle));
