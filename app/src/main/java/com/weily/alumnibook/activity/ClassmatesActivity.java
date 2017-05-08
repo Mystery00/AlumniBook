@@ -1,7 +1,6 @@
 package com.weily.alumnibook.activity;
 
 import android.annotation.SuppressLint;
-import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -10,6 +9,7 @@ import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -20,9 +20,12 @@ import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
 import com.mystery0.tools.Logs.Logs;
 import com.mystery0.tools.MysteryNetFrameWork.HttpUtil;
+import com.mystery0.tools.MysteryNetFrameWork.ResponseListener;
 import com.mystery0.tools.PictureChooser.iPictureChooser;
 import com.mystery0.tools.PictureChooser.iPictureChooserListener;
 import com.weily.alumnibook.ActivityMethod;
@@ -30,10 +33,10 @@ import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
 import com.weily.alumnibook.adapter.PhoneEmailAdapter;
 import com.weily.alumnibook.classs.Classmates;
+import com.weily.alumnibook.classs.Response;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,15 +57,13 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
     private RadioGroup sex;
     private TextInputLayout ps;
     private TextInputLayout scandal;
-    private RecyclerView phoneRecycler;
-    private RecyclerView emailRecycler;
     private TextInputLayout phone_edit;
     private TextInputLayout email_edit;
     private iPictureChooser pictureChooser;
     private ImageButton addTel;
     private ImageButton addEmail;
     private SwipeRefreshLayout swipeRefreshLayout;
-    private Classmates classmates;
+    private AppCompatSpinner spinner;
     private List<String> phoneList;
     private List<String> emailList;
     private List<String> photoList;
@@ -70,7 +71,7 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
     private PhoneEmailAdapter emailAdapter;
     private Menu menu;
     private boolean isNew = true;
-    private String date;
+    private String date="";
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -88,6 +89,7 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
         phoneList = new ArrayList<>();
         emailList = new ArrayList<>();
         photoList = new ArrayList<>();
+        Classmates classmates;
         if (bundle != null)
         {
             isNew = false;
@@ -125,12 +127,13 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
         relationshipWithMe = (TextInputLayout) findViewById(R.id.relation_edit);
         scandal = (TextInputLayout) findViewById(R.id.scandal_edit);
         sex = (RadioGroup) findViewById(R.id.sex_choose);
-        phoneRecycler = (RecyclerView) findViewById(R.id.tel_recycler);
-        emailRecycler = (RecyclerView) findViewById(R.id.email_recycler);
+        RecyclerView phoneRecycler = (RecyclerView) findViewById(R.id.tel_recycler);
+        RecyclerView emailRecycler = (RecyclerView) findViewById(R.id.email_recycler);
         phone_edit = (TextInputLayout) findViewById(R.id.tel_edit);
         email_edit = (TextInputLayout) findViewById(R.id.email_edit);
         pictureChooser = (iPictureChooser) findViewById(R.id.picture_chooser);
         ps = (TextInputLayout) findViewById(R.id.other_edit);
+        spinner = (AppCompatSpinner) findViewById(R.id.spinner);
 
         addTel = (ImageButton) findViewById(R.id.tel_add);
         addEmail = (ImageButton) findViewById(R.id.email_add);
@@ -154,6 +157,7 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                 sex.check(R.id.sex_choose_woman);
                 break;
         }
+        spinner.setSelection(classmates.getType());
         phoneAdapter = new PhoneEmailAdapter(phoneList);
         emailAdapter = new PhoneEmailAdapter(emailList);
 
@@ -288,12 +292,57 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
         switch (item.getItemId())
         {
             case R.id.done:
-                ProgressDialog progressDialog = new ProgressDialog(ClassmatesActivity.this);
+                final ProgressDialog progressDialog = new ProgressDialog(ClassmatesActivity.this);
                 progressDialog.setCancelable(false);
+                progressDialog.setMessage("数据上传中……");
+                progressDialog.show();
                 Map<String, String> map = new HashMap<>();
+                map.put("userType", "student");
+                map.put("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"));
+                map.put("method", "updateStudent");
                 map.put("name", name.getEditText().getText().toString());
-//                map.put("schoolClass",);
+                map.put("schoolClass", class_edit.getEditText().getText().toString());
+                map.put("schoolNumber", number_edit.getEditText().getText().toString());
+                map.put("sex", sex.getCheckedRadioButtonId() == R.id.sex_choose_man ? "0" : "1");
+                map.put("birthday", date);
+                map.put("address", address.getEditText().getText().toString());
+                map.put("work", work_edit.getEditText().getText().toString());
+                map.put("home", fRelationship.getEditText().getText().toString());
+                map.put("withMe", relationshipWithMe.getEditText().getText().toString());
+                map.put("embarrassing", scandal.getEditText().getText().toString());
+                map.put("remark", ps.getEditText().getText().toString());
+                map.put("type", String.valueOf(spinner.getSelectedItemPosition() + 1));
+                StringBuilder phoneListString = new StringBuilder();
+                for (String temp : phoneList)
+                {
+                    phoneListString.append(temp).append("|");
+                }
+                map.put("phoneList", phoneListString.toString());
+                StringBuilder emailListString = new StringBuilder();
+                for (String temp : emailList)
+                {
+                    emailListString.append(temp).append("|");
+                }
+                map.put("phoneList", emailListString.toString());
                 new HttpUtil(App.getContext())
+                        .setUrl(getString(R.string.request_url))
+                        .setRequestMethod(HttpUtil.RequestMethod.POST)
+                        .setMap(map)
+                        .setResponseListener(new ResponseListener()
+                        {
+                            @Override
+                            public void onResponse(int i, String s)
+                            {
+                                progressDialog.dismiss();
+                                if (i == 1)
+                                {
+                                    Logs.i(TAG, "onResponse: " + s);
+                                    Response response = new Gson().fromJson(s, Response.class);
+                                    Toast.makeText(App.getContext(), response.getContent(), Toast.LENGTH_SHORT)
+                                            .show();
+                                }
+                            }
+                        })
                         .open();
                 menu.findItem(R.id.edit).setVisible(true);
                 menu.findItem(R.id.done).setVisible(false);
