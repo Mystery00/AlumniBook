@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:orientation="vertical">
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.weily.alumnibook.activity.SendActivity"
+    tools:showIn="@layout/activity_send_activity">
 
     <Button
         android:id="@+id/choose_people"
@@ -11,33 +17,49 @@
         android:text="选择联系人"
         android:textSize="20sp"/>
 
+    <TextView
+        android:layout_width="match_parent"
+        android:id="@+id/checkList"
+        android:layout_height="wrap_content"
+        android:text="参与人员"
+        android:textSize="20sp"/>
+
     <android.support.design.widget.TextInputLayout
+        android:id="@+id/activity_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/Activity_name"
+        <android.support.design.widget.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="活动名"/>
+
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
+        android:id="@+id/activity_content"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <EditText
-            android:id="@+id/activity_content"
+        <android.support.design.widget.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:hint="活动内容"/>
+
     </android.support.design.widget.TextInputLayout>
 
-    <Button
-        android:id="@+id/send_activity"
+    <TextView
+        android:id="@+id/show_time"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="发布"
+        android:text="时间："
+        android:textSize="20sp"/>
+
+    <Button
+        android:id="@+id/choose_time"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="选择时间"
         android:textSize="20sp"/>
 
 </LinearLayout>

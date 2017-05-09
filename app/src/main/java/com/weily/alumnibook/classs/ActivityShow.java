@@ -11,7 +11,8 @@ public class ActivityShow implements Serializable
     private String activityName;
     private String activityContent;
     private String activityDate;
-    private String userList;
+    private String studentList;
+    private String teacherList;
 
     public String getActivityName()
     {
@@ -43,27 +44,33 @@ public class ActivityShow implements Serializable
         this.activityDate = activityDate;
     }
 
-    public String getUserList()
+    public String getStudentList()
     {
-        return userList;
+        return studentList;
     }
 
-    public void setUserList(String userList)
+    public void setStudentList(String studentList)
     {
-        this.userList = userList;
+        this.studentList = studentList;
     }
 
-    public ActivityShow()
+    public String getTeacherList()
     {
-
+        return teacherList;
     }
 
-    public ActivityShow(String activityName, String activityContent, String activityDate, String userList)
+    public void setTeacherList(String teacherList)
+    {
+        this.teacherList = teacherList;
+    }
+
+    public ActivityShow(String activityName, String activityContent, String activityDate, String studentList, String teacherList)
     {
 
         this.activityName = activityName;
         this.activityContent = activityContent;
         this.activityDate = activityDate;
-        this.userList = userList;
+        this.studentList = studentList;
+        this.teacherList = teacherList;
     }
 }

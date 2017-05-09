@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements ActivityMethod
         ViewPager teacher_viewPager = (ViewPager) findViewById(R.id.teacher_viewpager);
         TabLayout teacher_tabLayout = (TabLayout) findViewById(R.id.teacher_sliding_tabs);
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        final NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         TextView textView_header = (TextView) navigationView.getHeaderView(0).findViewById(R.id.user_name);
 
         textView_header.setText(getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "用户名"));
@@ -85,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements ActivityMethod
                         teacher_layout.setVisibility(View.GONE);
                         break;
                     case R.id.nav_activity:
-                        Intent intent = new Intent(getApplicationContext(), MyActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), ShowActivity.class);
                         startActivity(intent);
                         break;
                 }
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements ActivityMethod
             @Override
             public void onClick(View view)
             {
-                startActivity(new Intent(App.getContext(), type == 1 ? ClassmatesActivity.class : TeacherActivity.class));
+                startActivity(new Intent(App.getContext(), type == 1 ? TeacherActivity.class : ClassmatesActivity.class));
             }
         });
     }

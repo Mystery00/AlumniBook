@@ -11,6 +11,7 @@ import android.widget.TextView;
 import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
 import com.weily.alumnibook.activity.ActivityShowActivity;
+import com.weily.alumnibook.activity.SendActivity;
 import com.weily.alumnibook.classs.ActivityShow;
 
 import java.util.List;
@@ -62,7 +63,7 @@ public class ActivityShowAdapter extends RecyclerView.Adapter<ActivityShowAdapte
             @Override
             public void onClick(View v)
             {
-                Intent intent = new Intent(App.getContext(), ActivityShowActivity.class);
+                Intent intent = new Intent(App.getContext(), SendActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("activity", activityShowListList.get(holder.getAdapterPosition()));
                 intent.putExtra("activity", bundle);

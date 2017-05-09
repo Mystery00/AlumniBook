@@ -34,11 +34,21 @@
         <activity
             android:name=".activity.RegisterActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".activity.MyActivity"/>
-        <activity android:name=".activity.SendActivity"/>
-        <activity android:name=".activity.ActivityShowActivity"/>
+        <activity
+            android:name=".activity.SendActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".activity.ActivityShowActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".activity.TeacherActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".activity.ShowActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".activity.ChoosePeopleActivity"
+            android:label="@string/title_activity_choose_people"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
     </application>
