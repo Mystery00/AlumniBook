@@ -105,6 +105,24 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                     emailList.add(temp);
             }
             date = classmates.getBirthday();
+            Map<String, String> map = new HashMap<>();
+            map.put("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"));
+            map.put("type", "student");
+            map.put("method", "getFile");
+            map.put("userType", "user");
+            new HttpUtil(App.getContext())
+                    .setRequestMethod(HttpUtil.RequestMethod.POST)
+                    .setUrl(getString(R.string.request_url))
+                    .setMap(map)
+                    .setResponseListener(new ResponseListener()
+                    {
+                        @Override
+                        public void onResponse(int i, String s)
+                        {
+
+                        }
+                    })
+                    .open();
             photoList.add("http://ww2.sinaimg.cn/orj480/76da98c1gw1f5yhzht65hj20qo1bfgul.jpg");
             photoList.add("http://ww2.sinaimg.cn/orj480/76da98c1gw1f5yhzht65hj20qo1bfgul.jpg");
             photoList.add("http://i0.hdslb.com/bfs/archive/7c83ebda27b6e2c6fc6670f08aec28bd224da69c.jpg");
