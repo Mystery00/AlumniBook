@@ -1,108 +1,84 @@
 package com.weily.alumnibook.fragment;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.gson.Gson;
+import com.mystery0.tools.Logs.Logs;
+import com.mystery0.tools.MysteryNetFrameWork.HttpUtil;
+import com.mystery0.tools.MysteryNetFrameWork.ResponseListener;
+import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
-import com.weily.alumnibook.activity.ActivityShowActivity;
 import com.weily.alumnibook.adapter.ActivityShowAdapter;
 import com.weily.alumnibook.classs.Activity;
 import com.weily.alumnibook.classs.ActivityShow;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-
-import okhttp3.FormBody;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import java.util.Map;
 
 
-public class ActivityFragment extends Fragment implements ActivityShowAdapter.OnItemClickListener{
+public class ActivityFragment extends Fragment
+{
 
+    private static final String TAG = "ActivityFragment";
     private RecyclerView activityRecycler;
     private LinearLayoutManager linearLayoutManager;
     private ActivityShowAdapter adapter;
-    private List<ActivityShow> activityShowList=new ArrayList<>();
-
+    private List<ActivityShow> activityShowList = new ArrayList<>();
 
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view=inflater.inflate(R.layout.show_activity_recycler,container,false);
-        activityRecycler= (RecyclerView) view.findViewById(R.id.activity_recycler);
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState)
+    {
+        View view = inflater.inflate(R.layout.show_activity_recycler, container, false);
+        activityRecycler = (RecyclerView) view.findViewById(R.id.activity_recycler);
 
         initial();
-        linearLayoutManager=new LinearLayoutManager(getContext());
+        linearLayoutManager = new LinearLayoutManager(getContext());
         activityRecycler.setLayoutManager(linearLayoutManager);
-        adapter=new ActivityShowAdapter(activityShowList);
+        adapter = new ActivityShowAdapter(activityShowList);
         activityRecycler.setAdapter(adapter);
-
-        adapter.setOnItemClickListener(this);
 
         return view;
     }
 
 
-
-    public void initial(){
+    public void initial()
+    {
         activityShowList.clear();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                OkHttpClient client=new OkHttpClient();
-                String username="asd";
-                RequestBody requestBody=new FormBody.Builder()
-                        .add("username",username)
-                        .add("userType","activity")
-                        .add("method","getActivityList")
-                        .build();
-                Request request = new Request.Builder()
-                        .url("http://www.mystery0.vip/php/alumnibook/alumnibook.php")
-                        .post(requestBody)
-                        .build();
-                try {
-                    final Response response=client.newCall(request).execute();
-                    if (response.isSuccessful()) {
-                        final String responseData = response.body().string();
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                Gson gson = new Gson();
-                                Activity activity = gson.fromJson(responseData, Activity.class);
-                                ActivityShow activityShow[]=activity.getActivityShow();
-                                for (ActivityShow a:activityShow){
-                                    activityShowList.add(a);
-                                    adapter.notifyDataSetChanged();
-                                }
-                                Log.i("info", "run: "+responseData);
-
-                            }
-                        });
+        Map<String, String> map = new HashMap<>();
+        map.put("username", App.getContext().getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).getString("username", "test"));
+        map.put("userType", "activity");
+        map.put("method", "getActivityList");
+        new HttpUtil(App.getContext())
+                .setRequestMethod(HttpUtil.RequestMethod.POST)
+                .setUrl(getString(R.string.request_url))
+                .setMap(map)
+                .setResponseListener(new ResponseListener()
+                {
+                    @Override
+                    public void onResponse(int i, String s)
+                    {
+                        if (i == 1)
+                        {
+                            Logs.i(TAG, "onResponse: " + s);
+                            Activity activity = new Gson().fromJson(s, Activity.class);
+                            activityShowList.addAll(Arrays.asList(activity.getActivityShow()));
+                            adapter.notifyDataSetChanged();
+                        }
                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }).start();
-    }
-
-    @Override
-    public void onItemClick(View view, int position) {
-        Intent intent=new Intent(getContext(), ActivityShowActivity.class);
-        startActivity(intent);
+                })
+                .open();
     }
 }

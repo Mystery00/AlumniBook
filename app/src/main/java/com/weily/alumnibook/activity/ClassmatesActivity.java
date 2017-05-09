@@ -33,6 +33,7 @@ import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
 import com.weily.alumnibook.adapter.PhoneEmailAdapter;
 import com.weily.alumnibook.classs.Classmates;
+import com.weily.alumnibook.classs.FileList;
 import com.weily.alumnibook.classs.Response;
 
 import java.util.ArrayList;
@@ -72,6 +73,7 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
     private Menu menu;
     private boolean isNew = true;
     private String date = "";
+    private HttpUtil httpUtil=new HttpUtil(App.getContext());
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -110,8 +112,8 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
             map.put("type", "student");
             map.put("method", "getFile");
             map.put("userType", "user");
-            new HttpUtil(App.getContext())
-                    .setRequestMethod(HttpUtil.RequestMethod.POST)
+            map.put("name", classmates.getName());
+            httpUtil.setRequestMethod(HttpUtil.RequestMethod.POST)
                     .setUrl(getString(R.string.request_url))
                     .setMap(map)
                     .setResponseListener(new ResponseListener()
@@ -119,14 +121,19 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                         @Override
                         public void onResponse(int i, String s)
                         {
-
+                            if (i == 1)
+                            {
+                                Logs.i(TAG, "onResponse: " + s);
+                                FileList fileList = new Gson().fromJson(s, FileList.class);
+                                for (String temp : fileList.getFiles())
+                                {
+                                    photoList.add(getString(R.string.request_url) + "/php/alumnibook/uploads/" + temp);
+                                }
+                                pictureChooser.setList(photoList);
+                            }
                         }
                     })
                     .open();
-            photoList.add("http://ww2.sinaimg.cn/orj480/76da98c1gw1f5yhzht65hj20qo1bfgul.jpg");
-            photoList.add("http://ww2.sinaimg.cn/orj480/76da98c1gw1f5yhzht65hj20qo1bfgul.jpg");
-            photoList.add("http://i0.hdslb.com/bfs/archive/7c83ebda27b6e2c6fc6670f08aec28bd224da69c.jpg");
-            photoList.add("http://p1.music.126.net/fUVCts6yu0k2QkXjVAfsjw==/18771962022655227.jpg");
         } else
         {
             classmates = new Classmates();
@@ -342,8 +349,7 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                     emailListString.append(temp).append("!");
                 }
                 map.put("emailList", emailListString.toString());
-                new HttpUtil(App.getContext())
-                        .setUrl(getString(R.string.request_url))
+                httpUtil.setUrl(getString(R.string.request_url))
                         .setRequestMethod(HttpUtil.RequestMethod.POST)
                         .setMap(map)
                         .setResponseListener(new ResponseListener()
@@ -361,6 +367,14 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                                 }
                             }
                         })
+                        .open();
+                Map<String,String> fileMap=new HashMap<>();
+                fileMap.put("userType", "user");
+                fileMap.put("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"));
+                fileMap.put("method", "uploadFile");
+                fileMap.put("name", name.getEditText().getText().toString());
+                httpUtil.setUrl(getString(R.string.request_url))
+                        .setRequestMethod(HttpUtil.RequestMethod.POST)
                         .open();
                 menu.findItem(R.id.edit).setVisible(true);
                 menu.findItem(R.id.done).setVisible(false);

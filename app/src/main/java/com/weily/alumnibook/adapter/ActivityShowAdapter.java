@@ -1,101 +1,80 @@
 package com.weily.alumnibook.adapter;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
+import com.weily.alumnibook.activity.ActivityShowActivity;
 import com.weily.alumnibook.classs.ActivityShow;
 
 import java.util.List;
-
-import static com.weily.alumnibook.R.id.c_name;
 
 /**
  * Created by HS on 2017/5/7.
  */
 
-public class ActivityShowAdapter extends RecyclerView.Adapter<ActivityShowAdapter.ViewHolder>{
+public class ActivityShowAdapter extends RecyclerView.Adapter<ActivityShowAdapter.ViewHolder>
+{
 
     private List<ActivityShow> activityShowListList;
-    private ActivityShowAdapter.OnItemClickListener cOnItemClickListener;
-    private ActivityShowAdapter.OnItemLongClickListener cOnItemLongClickListener;
 
 
-    public ActivityShowAdapter(List<ActivityShow> activityShowListList) {
+    public ActivityShowAdapter(List<ActivityShow> activityShowListList)
+    {
         this.activityShowListList = activityShowListList;
     }
 
-    public interface OnItemClickListener{
-        void onItemClick(View view, int position);
-    }
 
-    public interface OnItemLongClickListener{
-        void onItemLongClick(View view, int position);
-    }
-
-    public void setOnItemClickListener(ActivityShowAdapter.OnItemClickListener cOnItemClickListener){
-        this.cOnItemClickListener = cOnItemClickListener;
-    }
-
-    public void setOnItemLongClickListener(ActivityShowAdapter.OnItemLongClickListener cOnItemClickListener) {
-        this.cOnItemLongClickListener = cOnItemClickListener;
-    }
-
-
-    class ViewHolder extends RecyclerView.ViewHolder{
+    class ViewHolder extends RecyclerView.ViewHolder
+    {
         TextView activityName;
         View activityView;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView)
+        {
             super(itemView);
-            activityView=itemView;
-            activityName= (TextView) itemView.findViewById(c_name);
+            activityView = itemView;
+            activityName = (TextView) itemView.findViewById(R.id.c_name);
         }
     }
 
 
     @Override
-    public ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType) {
-        View view= LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item,parent,false);
-        final ActivityShowAdapter.ViewHolder viewHolder= new ViewHolder(view);
-
-        if(cOnItemClickListener!=null){
-            viewHolder.activityView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    int position=viewHolder.getAdapterPosition();
-                    cOnItemClickListener.onItemClick(viewHolder.itemView,position);
-                }
-            });
-        }
-        if (cOnItemLongClickListener!=null){
-            viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    int position = viewHolder.getLayoutPosition();
-                    cOnItemLongClickListener.onItemLongClick(viewHolder.itemView,position);
-                    return true;
-                }
-            });
-        }
-        return viewHolder;
-
+    public ViewHolder onCreateViewHolder(final ViewGroup parent, int viewType)
+    {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
+        return new ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(ActivityShowAdapter.ViewHolder holder, int position) {
-
-        ActivityShow activityShow=activityShowListList.get(position);
+    public void onBindViewHolder(final ActivityShowAdapter.ViewHolder holder, int position)
+    {
+        ActivityShow activityShow = activityShowListList.get(position);
         holder.activityName.setText(activityShow.getActivityName());
+        holder.activityView.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                Intent intent = new Intent(App.getContext(), ActivityShowActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("activity", activityShowListList.get(holder.getAdapterPosition()));
+                intent.putExtra("activity", bundle);
+                App.getContext().startActivity(intent);
+            }
+        });
     }
 
     @Override
-    public int getItemCount() {
+    public int getItemCount()
+    {
         return activityShowListList.size();
     }
-
 
 }

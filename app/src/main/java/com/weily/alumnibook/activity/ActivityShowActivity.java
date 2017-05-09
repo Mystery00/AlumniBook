@@ -18,12 +18,10 @@ public class ActivityShowActivity extends AppCompatActivity {
     private ActivityFragment activityFragment;
 
     @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
+    protected void onCreate(Bundle savedInstanceState)
+    {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.show_activity);
-
-        activityFragment= (ActivityFragment) getSupportFragmentManager().findFragmentById(R.id.activity_fragment);
-
-
+        activityFragment = (ActivityFragment) getSupportFragmentManager().findFragmentById(R.id.activity_fragment);
     }
 }
