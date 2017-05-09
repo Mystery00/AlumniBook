@@ -35,11 +35,22 @@ import com.weily.alumnibook.adapter.PhoneEmailAdapter;
 import com.weily.alumnibook.classs.Response;
 import com.weily.alumnibook.classs.Teacher;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 @SuppressWarnings("ConstantConditions")
 public class TeacherActivity extends AppCompatActivity implements ActivityMethod
@@ -340,6 +351,63 @@ public class TeacherActivity extends AppCompatActivity implements ActivityMethod
                             }
                         })
                         .open();
+                new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        List<String> pathList = pictureChooser.getList();
+                        for (String path : pathList)
+                        {
+                            final ProgressDialog progressDialog = new ProgressDialog(TeacherActivity.this);
+                            progressDialog.setCancelable(false);
+                            progressDialog.setMessage("数据上传中……");
+                            progressDialog.show();
+                            File file = new File(path);
+                            RequestBody fileBody = RequestBody.create(MediaType.parse("application/octet-stream"), file);
+                            RequestBody requestBody = new MultipartBody.Builder()
+                                    .setType(MultipartBody.FORM)
+                                    .addFormDataPart("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"))
+                                    .addFormDataPart("userType", "user")
+                                    .addFormDataPart("type","teacher")
+                                    .addFormDataPart("name", name.getEditText().getText().toString())
+                                    .addPart(Headers.of(
+                                            "Content-Disposition",
+                                            "form-data; name=\"username\""),
+                                            RequestBody.create(null, "HGR"))
+                                    .addPart(Headers.of(
+                                            "Content-Disposition",
+                                            "form-data; name=\"mFile\"; filename=\"" + "test.jpg" + "\""), fileBody)
+                                    .build();
+                            Request request = new Request.Builder()
+                                    .url(getString(R.string.request_url))
+                                    .post(requestBody)
+                                    .build();
+                            OkHttpClient okHttpClient = new OkHttpClient();
+                            Call call = okHttpClient.newCall(request);
+                            call.enqueue(new Callback()
+                            {
+                                @Override
+                                public void onFailure(Call call, IOException e)
+                                {
+                                    progressDialog.dismiss();
+                                    Toast.makeText(App.getContext(), "error", Toast.LENGTH_SHORT)
+                                            .show();
+                                    Logs.e(TAG, "onFailure: error");
+                                }
+
+                                @Override
+                                public void onResponse(Call call, okhttp3.Response response) throws IOException
+                                {
+                                    progressDialog.dismiss();
+                                    Response response1 = new Gson().fromJson(response.body().string(), Response.class);
+                                    Toast.makeText(App.getContext(), response1.getContent(), Toast.LENGTH_SHORT)
+                                            .show();
+                                }
+                            });
+                        }
+                    }
+                }).start();
                 menu.findItem(R.id.edit).setVisible(true);
                 menu.findItem(R.id.done).setVisible(false);
                 break;

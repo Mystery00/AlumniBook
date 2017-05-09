@@ -13,6 +13,7 @@ import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -36,11 +37,22 @@ import com.weily.alumnibook.classs.Classmates;
 import com.weily.alumnibook.classs.FileList;
 import com.weily.alumnibook.classs.Response;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Headers;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
 
 @SuppressWarnings("ConstantConditions")
 public class ClassmatesActivity extends AppCompatActivity implements ActivityMethod
@@ -73,7 +85,7 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
     private Menu menu;
     private boolean isNew = true;
     private String date = "";
-    private HttpUtil httpUtil=new HttpUtil(App.getContext());
+    private HttpUtil httpUtil = new HttpUtil(App.getContext());
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -357,9 +369,9 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                             @Override
                             public void onResponse(int i, String s)
                             {
-                                progressDialog.dismiss();
                                 if (i == 1)
                                 {
+                                    progressDialog.dismiss();
                                     Logs.i(TAG, "onResponse: " + s);
                                     Response response = new Gson().fromJson(s, Response.class);
                                     Toast.makeText(App.getContext(), response.getContent(), Toast.LENGTH_SHORT)
@@ -368,14 +380,63 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                             }
                         })
                         .open();
-                Map<String,String> fileMap=new HashMap<>();
-                fileMap.put("userType", "user");
-                fileMap.put("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"));
-                fileMap.put("method", "uploadFile");
-                fileMap.put("name", name.getEditText().getText().toString());
-                httpUtil.setUrl(getString(R.string.request_url))
-                        .setRequestMethod(HttpUtil.RequestMethod.POST)
-                        .open();
+                new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        List<String> pathList = pictureChooser.getList();
+                        for (String path : pathList)
+                        {
+                            final ProgressDialog progressDialog = new ProgressDialog(ClassmatesActivity.this);
+                            progressDialog.setCancelable(false);
+                            progressDialog.setMessage("数据上传中……");
+                            progressDialog.show();
+                            File file = new File(path);
+                            RequestBody fileBody = RequestBody.create(MediaType.parse("application/octet-stream"), file);
+                            RequestBody requestBody = new MultipartBody.Builder()
+                                    .setType(MultipartBody.FORM)
+                                    .addFormDataPart("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"))
+                                    .addFormDataPart("userType", "user")
+                                    .addFormDataPart("type","student")
+                                    .addFormDataPart("name", name.getEditText().getText().toString())
+                                    .addPart(Headers.of(
+                                            "Content-Disposition",
+                                            "form-data; name=\"username\""),
+                                            RequestBody.create(null, "HGR"))
+                                    .addPart(Headers.of(
+                                            "Content-Disposition",
+                                            "form-data; name=\"mFile\"; filename=\"" + "test.jpg" + "\""), fileBody)
+                                    .build();
+                            Request request = new Request.Builder()
+                                    .url(getString(R.string.request_url))
+                                    .post(requestBody)
+                                    .build();
+                            OkHttpClient okHttpClient = new OkHttpClient();
+                            Call call = okHttpClient.newCall(request);
+                            call.enqueue(new Callback()
+                            {
+                                @Override
+                                public void onFailure(Call call, IOException e)
+                                {
+                                    progressDialog.dismiss();
+                                    Toast.makeText(App.getContext(), "error", Toast.LENGTH_SHORT)
+                                            .show();
+                                    Logs.e(TAG, "onFailure: error");
+                                }
+
+                                @Override
+                                public void onResponse(Call call, okhttp3.Response response) throws IOException
+                                {
+                                    progressDialog.dismiss();
+                                    Response response1 = new Gson().fromJson(response.body().string(), Response.class);
+                                    Toast.makeText(App.getContext(), response1.getContent(), Toast.LENGTH_SHORT)
+                                            .show();
+                                }
+                            });
+                        }
+                    }
+                }).start();
                 menu.findItem(R.id.edit).setVisible(true);
                 menu.findItem(R.id.done).setVisible(false);
                 break;
