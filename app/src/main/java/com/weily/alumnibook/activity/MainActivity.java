@@ -106,7 +106,6 @@ public class MainActivity extends AppCompatActivity implements ActivityMethod
                 startActivity(new Intent(App.getContext(), type == 1 ? ClassmatesActivity.class : TeacherActivity.class));
             }
         });
-
     }
 
     @Override
