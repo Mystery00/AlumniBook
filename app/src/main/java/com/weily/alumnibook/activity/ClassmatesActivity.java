@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -58,6 +60,7 @@ import okhttp3.RequestBody;
 public class ClassmatesActivity extends AppCompatActivity implements ActivityMethod
 {
     private static final String TAG = "ClassmatesActivity";
+    private static final int HANDLER=233;
     private Toolbar toolbar;
     private TextInputLayout name;
     private TextView birthday;
@@ -86,6 +89,19 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
     private boolean isNew = true;
     private String date = "";
     private HttpUtil httpUtil = new HttpUtil(App.getContext());
+    private ProgressDialog progressDialog1;
+    private Handler handler=new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what==HANDLER)
+            {
+                Toast.makeText(App.getContext(), (String)msg.obj, Toast.LENGTH_SHORT)
+                        .show();
+                progressDialog1.dismiss();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -380,25 +396,26 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                             }
                         })
                         .open();
+                progressDialog1 = new ProgressDialog(ClassmatesActivity.this);
+                progressDialog1.setCancelable(false);
+                progressDialog1.setMessage("数据上传中……");
+                progressDialog1.show();
                 new Thread(new Runnable()
                 {
                     @Override
                     public void run()
                     {
-                        List<String> pathList = pictureChooser.getList();
-                        for (String path : pathList)
+                        final List<String> pathList = pictureChooser.getList();
+                        for (int i=0;i<pathList.size();i++)
                         {
-                            final ProgressDialog progressDialog = new ProgressDialog(ClassmatesActivity.this);
-                            progressDialog.setCancelable(false);
-                            progressDialog.setMessage("数据上传中……");
-                            progressDialog.show();
-                            File file = new File(path);
+                            File file = new File(pathList.get(i));
                             RequestBody fileBody = RequestBody.create(MediaType.parse("application/octet-stream"), file);
                             RequestBody requestBody = new MultipartBody.Builder()
                                     .setType(MultipartBody.FORM)
                                     .addFormDataPart("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"))
                                     .addFormDataPart("userType", "user")
                                     .addFormDataPart("type","student")
+                                    .addFormDataPart("method","uploadFile")
                                     .addFormDataPart("name", name.getEditText().getText().toString())
                                     .addPart(Headers.of(
                                             "Content-Disposition",
@@ -414,24 +431,30 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                                     .build();
                             OkHttpClient okHttpClient = new OkHttpClient();
                             Call call = okHttpClient.newCall(request);
+                            final int finalI = i;
                             call.enqueue(new Callback()
                             {
                                 @Override
                                 public void onFailure(Call call, IOException e)
                                 {
-                                    progressDialog.dismiss();
-                                    Toast.makeText(App.getContext(), "error", Toast.LENGTH_SHORT)
-                                            .show();
+                                    Message message=new Message();
+                                    message.what=HANDLER;
+                                    message.obj="error";
+                                    handler.sendMessage(message);
                                     Logs.e(TAG, "onFailure: error");
                                 }
 
                                 @Override
                                 public void onResponse(Call call, okhttp3.Response response) throws IOException
                                 {
-                                    progressDialog.dismiss();
-                                    Response response1 = new Gson().fromJson(response.body().string(), Response.class);
-                                    Toast.makeText(App.getContext(), response1.getContent(), Toast.LENGTH_SHORT)
-                                            .show();
+                                    if (finalI ==pathList.size()-1)
+                                    {
+                                        Response response1 = new Gson().fromJson(response.body().string(), Response.class);
+                                        Message message=new Message();
+                                        message.what=HANDLER;
+                                        message.obj=response1.getContent();
+                                        handler.sendMessage(message);
+                                    }
                                 }
                             });
                         }
