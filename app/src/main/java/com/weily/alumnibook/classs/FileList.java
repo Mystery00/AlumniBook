@@ -3,7 +3,7 @@ package com.weily.alumnibook.classs;
 public class FileList
 {
     private int number;
-    private String[] files;
+    private MyFile[] files;
 
     public int getNumber()
     {
@@ -15,12 +15,12 @@ public class FileList
         this.number = number;
     }
 
-    public String[] getFiles()
+    public MyFile[] getFiles()
     {
         return files;
     }
 
-    public void setFiles(String[] files)
+    public void setFiles(MyFile[] files)
     {
         this.files = files;
     }
@@ -30,9 +30,8 @@ public class FileList
 
     }
 
-    public FileList(int number, String[] files)
+    public FileList(int number, MyFile[] files)
     {
-
         this.number = number;
         this.files = files;
     }

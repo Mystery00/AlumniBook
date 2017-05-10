@@ -5,6 +5,8 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
@@ -32,6 +34,8 @@ import com.weily.alumnibook.ActivityMethod;
 import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
 import com.weily.alumnibook.adapter.PhoneEmailAdapter;
+import com.weily.alumnibook.classs.FileList;
+import com.weily.alumnibook.classs.MyFile;
 import com.weily.alumnibook.classs.Response;
 import com.weily.alumnibook.classs.Teacher;
 
@@ -45,7 +49,6 @@ import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -56,18 +59,14 @@ import okhttp3.RequestBody;
 public class TeacherActivity extends AppCompatActivity implements ActivityMethod
 {
     private static final String TAG = "ClassmatesActivity";
+    private static final int HANDLER = 233;
     private Toolbar toolbar;
     private TextInputLayout name;
     private TextView birthday;
     private TextInputLayout class_edit;
-    private TextInputLayout number_edit;
     private TextInputLayout address;
-    private TextInputLayout work_edit;
-    private TextInputLayout fRelationship;
-    private TextInputLayout relationshipWithMe;
     private RadioGroup sex;
     private TextInputLayout ps;
-    private TextInputLayout scandal;
     private TextInputLayout phone_edit;
     private TextInputLayout email_edit;
     private iPictureChooser pictureChooser;
@@ -83,6 +82,28 @@ public class TeacherActivity extends AppCompatActivity implements ActivityMethod
     private Menu menu;
     private boolean isNew = true;
     private String date = "";
+    private ProgressDialog progressDialog1;
+    private HttpUtil httpUtil=new HttpUtil(App.getContext());
+
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler()
+    {
+        @Override
+        public void handleMessage(Message msg)
+        {
+            if (msg.what == HANDLER)
+            {
+                Response response = (Response) msg.obj;
+                Toast.makeText(App.getContext(), response.getContent(), Toast.LENGTH_SHORT)
+                        .show();
+                progressDialog1.dismiss();
+                if (msg.arg1 != 0)
+                {
+                    progressDialog1.show();
+                }
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -116,10 +137,33 @@ public class TeacherActivity extends AppCompatActivity implements ActivityMethod
                     emailList.add(temp);
             }
             date = teacher.getBirthday();
-            photoList.add("http://ww2.sinaimg.cn/orj480/76da98c1gw1f5yhzht65hj20qo1bfgul.jpg");
-            photoList.add("http://ww2.sinaimg.cn/orj480/76da98c1gw1f5yhzht65hj20qo1bfgul.jpg");
-            photoList.add("http://i0.hdslb.com/bfs/archive/7c83ebda27b6e2c6fc6670f08aec28bd224da69c.jpg");
-            photoList.add("http://p1.music.126.net/fUVCts6yu0k2QkXjVAfsjw==/18771962022655227.jpg");
+            Map<String, String> map = new HashMap<>();
+            map.put("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"));
+            map.put("type", "teacher");
+            map.put("method", "getFile");
+            map.put("userType", "user");
+            map.put("name", teacher.getName());
+            httpUtil.setRequestMethod(HttpUtil.RequestMethod.POST)
+                    .setUrl(getString(R.string.request_url))
+                    .setMap(map)
+                    .setResponseListener(new ResponseListener()
+                    {
+                        @Override
+                        public void onResponse(int i, String s)
+                        {
+                            if (i == 1)
+                            {
+                                Logs.i(TAG, "onResponse: " + s);
+                                FileList fileList = new Gson().fromJson(s, FileList.class);
+                                for (MyFile temp : fileList.getFiles())
+                                {
+                                    photoList.add("http://www.mystery0.vip//php/alumnibook/uploads/" + temp.getFileName());
+                                }
+                                pictureChooser.setList(photoList);
+                            }
+                        }
+                    })
+                    .open();
         } else
         {
             teacher = new Teacher();
@@ -130,13 +174,13 @@ public class TeacherActivity extends AppCompatActivity implements ActivityMethod
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         name = (TextInputLayout) findViewById(R.id.name_edit);
         class_edit = (TextInputLayout) findViewById(R.id.class_edit);
-        number_edit = (TextInputLayout) findViewById(R.id.number_edit);
-        work_edit = (TextInputLayout) findViewById(R.id.work_edit);
+        TextInputLayout number_edit = (TextInputLayout) findViewById(R.id.number_edit);
+        TextInputLayout work_edit = (TextInputLayout) findViewById(R.id.work_edit);
         birthday = (TextView) findViewById(R.id.birthday_edit);
         address = (TextInputLayout) findViewById(R.id.add_edit);
-        fRelationship = (TextInputLayout) findViewById(R.id.fam_re_edit);
-        relationshipWithMe = (TextInputLayout) findViewById(R.id.relation_edit);
-        scandal = (TextInputLayout) findViewById(R.id.scandal_edit);
+        TextInputLayout fRelationship = (TextInputLayout) findViewById(R.id.fam_re_edit);
+        TextInputLayout relationshipWithMe = (TextInputLayout) findViewById(R.id.relation_edit);
+        TextInputLayout scandal = (TextInputLayout) findViewById(R.id.scandal_edit);
         sex = (RadioGroup) findViewById(R.id.sex_choose);
         RecyclerView phoneRecycler = (RecyclerView) findViewById(R.id.tel_recycler);
         RecyclerView emailRecycler = (RecyclerView) findViewById(R.id.email_recycler);
@@ -351,33 +395,36 @@ public class TeacherActivity extends AppCompatActivity implements ActivityMethod
                             }
                         })
                         .open();
+                if (pictureChooser.getList().size() != 0)
+                {
+                    progressDialog1 = new ProgressDialog(TeacherActivity.this);
+                    progressDialog1.setCancelable(false);
+                    progressDialog1.setMessage("数据上传中……");
+                    progressDialog1.show();
+                }
                 new Thread(new Runnable()
                 {
                     @Override
                     public void run()
                     {
-                        List<String> pathList = pictureChooser.getList();
-                        for (String path : pathList)
+                        final List<String> pathList = pictureChooser.getList();
+                        for (int i = 0; i < pathList.size(); i++)
                         {
-                            final ProgressDialog progressDialog = new ProgressDialog(TeacherActivity.this);
-                            progressDialog.setCancelable(false);
-                            progressDialog.setMessage("数据上传中……");
-                            progressDialog.show();
-                            File file = new File(path);
-                            RequestBody fileBody = RequestBody.create(MediaType.parse("application/octet-stream"), file);
+                            if (pathList.get(i).substring(0,4).equals("http"))
+                            {
+                                continue;
+                            }
+                            File file = new File(pathList.get(i));
+                            RequestBody fileBody = RequestBody.create(MediaType.parse("image/*"), file);
+                            String fileName=file.getName();
                             RequestBody requestBody = new MultipartBody.Builder()
                                     .setType(MultipartBody.FORM)
                                     .addFormDataPart("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"))
                                     .addFormDataPart("userType", "user")
-                                    .addFormDataPart("type","teacher")
+                                    .addFormDataPart("type", "teacher")
+                                    .addFormDataPart("method", "uploadFile")
                                     .addFormDataPart("name", name.getEditText().getText().toString())
-                                    .addPart(Headers.of(
-                                            "Content-Disposition",
-                                            "form-data; name=\"username\""),
-                                            RequestBody.create(null, "HGR"))
-                                    .addPart(Headers.of(
-                                            "Content-Disposition",
-                                            "form-data; name=\"mFile\"; filename=\"" + "test.jpg" + "\""), fileBody)
+                                    .addFormDataPart("upload_file",fileName,fileBody)
                                     .build();
                             Request request = new Request.Builder()
                                     .url(getString(R.string.request_url))
@@ -385,24 +432,34 @@ public class TeacherActivity extends AppCompatActivity implements ActivityMethod
                                     .build();
                             OkHttpClient okHttpClient = new OkHttpClient();
                             Call call = okHttpClient.newCall(request);
+                            final int finalI = i;
                             call.enqueue(new Callback()
                             {
                                 @Override
                                 public void onFailure(Call call, IOException e)
                                 {
-                                    progressDialog.dismiss();
-                                    Toast.makeText(App.getContext(), "error", Toast.LENGTH_SHORT)
-                                            .show();
+                                    Message message = new Message();
+                                    message.what = HANDLER;
+                                    message.arg1 = 0;
+                                    message.obj = new Response(404, "error");
+                                    handler.sendMessage(message);
                                     Logs.e(TAG, "onFailure: error");
                                 }
 
                                 @Override
                                 public void onResponse(Call call, okhttp3.Response response) throws IOException
                                 {
-                                    progressDialog.dismiss();
-                                    Response response1 = new Gson().fromJson(response.body().string(), Response.class);
-                                    Toast.makeText(App.getContext(), response1.getContent(), Toast.LENGTH_SHORT)
-                                            .show();
+                                    String s = response.body().string();
+                                    Logs.i(TAG, "onResponse: " + s);
+                                    Response response1 = new Gson().fromJson(s, Response.class);
+                                    Message message = new Message();
+                                    message.what = HANDLER;
+                                    message.obj = response1;
+                                    if (finalI == pathList.size() - 1)
+                                    {
+                                        message.arg1 = 0;
+                                    }
+                                    handler.sendMessage(message);
                                 }
                             });
                         }

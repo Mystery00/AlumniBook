@@ -15,7 +15,6 @@ import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +36,7 @@ import com.weily.alumnibook.R;
 import com.weily.alumnibook.adapter.PhoneEmailAdapter;
 import com.weily.alumnibook.classs.Classmates;
 import com.weily.alumnibook.classs.FileList;
+import com.weily.alumnibook.classs.MyFile;
 import com.weily.alumnibook.classs.Response;
 
 import java.io.File;
@@ -49,7 +49,6 @@ import java.util.Map;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.Headers;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -60,7 +59,7 @@ import okhttp3.RequestBody;
 public class ClassmatesActivity extends AppCompatActivity implements ActivityMethod
 {
     private static final String TAG = "ClassmatesActivity";
-    private static final int HANDLER=233;
+    private static final int HANDLER = 233;
     private Toolbar toolbar;
     private TextInputLayout name;
     private TextView birthday;
@@ -90,15 +89,22 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
     private String date = "";
     private HttpUtil httpUtil = new HttpUtil(App.getContext());
     private ProgressDialog progressDialog1;
-    private Handler handler=new Handler()
+    @SuppressLint("HandlerLeak")
+    private Handler handler = new Handler()
     {
         @Override
-        public void handleMessage(Message msg) {
-            if (msg.what==HANDLER)
+        public void handleMessage(Message msg)
+        {
+            if (msg.what == HANDLER)
             {
-                Toast.makeText(App.getContext(), (String)msg.obj, Toast.LENGTH_SHORT)
+                Response response = (Response) msg.obj;
+                Toast.makeText(App.getContext(), response.getContent(), Toast.LENGTH_SHORT)
                         .show();
                 progressDialog1.dismiss();
+                if (msg.arg1 != 0)
+                {
+                    progressDialog1.show();
+                }
             }
         }
     };
@@ -153,9 +159,9 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                             {
                                 Logs.i(TAG, "onResponse: " + s);
                                 FileList fileList = new Gson().fromJson(s, FileList.class);
-                                for (String temp : fileList.getFiles())
+                                for (MyFile temp : fileList.getFiles())
                                 {
-                                    photoList.add(getString(R.string.request_url) + "/php/alumnibook/uploads/" + temp);
+                                    photoList.add("http://www.mystery0.vip//php/alumnibook/uploads/" + temp.getFileName());
                                 }
                                 pictureChooser.setList(photoList);
                             }
@@ -396,34 +402,36 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                             }
                         })
                         .open();
-                progressDialog1 = new ProgressDialog(ClassmatesActivity.this);
-                progressDialog1.setCancelable(false);
-                progressDialog1.setMessage("数据上传中……");
-                progressDialog1.show();
+                if (pictureChooser.getList().size() != 0)
+                {
+                    progressDialog1 = new ProgressDialog(ClassmatesActivity.this);
+                    progressDialog1.setCancelable(false);
+                    progressDialog1.setMessage("数据上传中……");
+                    progressDialog1.show();
+                }
                 new Thread(new Runnable()
                 {
                     @Override
                     public void run()
                     {
                         final List<String> pathList = pictureChooser.getList();
-                        for (int i=0;i<pathList.size();i++)
+                        for (int i = 0; i < pathList.size(); i++)
                         {
+                            if (pathList.get(i).substring(0,4).equals("http"))
+                            {
+                                continue;
+                            }
                             File file = new File(pathList.get(i));
-                            RequestBody fileBody = RequestBody.create(MediaType.parse("application/octet-stream"), file);
+                            RequestBody fileBody = RequestBody.create(MediaType.parse("image/*"), file);
+                            String fileName = file.getName();
                             RequestBody requestBody = new MultipartBody.Builder()
                                     .setType(MultipartBody.FORM)
                                     .addFormDataPart("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"))
                                     .addFormDataPart("userType", "user")
-                                    .addFormDataPart("type","student")
-                                    .addFormDataPart("method","uploadFile")
+                                    .addFormDataPart("type", "student")
+                                    .addFormDataPart("method", "uploadFile")
                                     .addFormDataPart("name", name.getEditText().getText().toString())
-                                    .addPart(Headers.of(
-                                            "Content-Disposition",
-                                            "form-data; name=\"username\""),
-                                            RequestBody.create(null, "HGR"))
-                                    .addPart(Headers.of(
-                                            "Content-Disposition",
-                                            "form-data; name=\"mFile\"; filename=\"" + "test.jpg" + "\""), fileBody)
+                                    .addFormDataPart("upload_file", fileName, fileBody)
                                     .build();
                             Request request = new Request.Builder()
                                     .url(getString(R.string.request_url))
@@ -437,9 +445,10 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                                 @Override
                                 public void onFailure(Call call, IOException e)
                                 {
-                                    Message message=new Message();
-                                    message.what=HANDLER;
-                                    message.obj="error";
+                                    Message message = new Message();
+                                    message.what = HANDLER;
+                                    message.arg1 = 0;
+                                    message.obj = new Response(404, "error");
                                     handler.sendMessage(message);
                                     Logs.e(TAG, "onFailure: error");
                                 }
@@ -447,14 +456,17 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                                 @Override
                                 public void onResponse(Call call, okhttp3.Response response) throws IOException
                                 {
-                                    if (finalI ==pathList.size()-1)
+                                    String s = response.body().string();
+                                    Logs.i(TAG, "onResponse: " + s);
+                                    Response response1 = new Gson().fromJson(s, Response.class);
+                                    Message message = new Message();
+                                    message.what = HANDLER;
+                                    message.obj = response1;
+                                    if (finalI == pathList.size() - 1)
                                     {
-                                        Response response1 = new Gson().fromJson(response.body().string(), Response.class);
-                                        Message message=new Message();
-                                        message.what=HANDLER;
-                                        message.obj=response1.getContent();
-                                        handler.sendMessage(message);
+                                        message.arg1 = 0;
                                     }
+                                    handler.sendMessage(message);
                                 }
                             });
                         }
