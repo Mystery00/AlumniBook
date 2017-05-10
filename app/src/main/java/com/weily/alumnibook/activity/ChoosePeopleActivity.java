@@ -12,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.google.gson.Gson;
+import com.mystery0.tools.Logs.Logs;
 import com.mystery0.tools.MysteryNetFrameWork.HttpUtil;
 import com.mystery0.tools.MysteryNetFrameWork.ResponseListener;
 import com.weily.alumnibook.ActivityMethod;
@@ -30,6 +31,7 @@ import java.util.Map;
 
 public class ChoosePeopleActivity extends AppCompatActivity implements ActivityMethod
 {
+    private static final String TAG = "ChoosePeopleActivity";
     private Toolbar toolbar;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ChoosePeopleAdapter adapter;
@@ -157,6 +159,7 @@ public class ChoosePeopleActivity extends AppCompatActivity implements ActivityM
                     {
                         if (i == 1)
                         {
+                            Logs.i(TAG, "onResponse: "+s);
                             ShowList showList = new Gson().fromJson(s, ShowList.class);
                             showArrayList.clear();
                             classmatesList.clear();

@@ -417,8 +417,12 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                         final List<String> pathList = pictureChooser.getList();
                         for (int i = 0; i < pathList.size(); i++)
                         {
-                            if (pathList.get(i).substring(0,4).equals("http"))
+                            if (pathList.get(i).substring(0, 4).equals("http"))
                             {
+                                if (i == pathList.size() - 1)
+                                {
+                                    progressDialog1.dismiss();
+                                }
                                 continue;
                             }
                             File file = new File(pathList.get(i));

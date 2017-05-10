@@ -83,7 +83,7 @@ public class TeacherActivity extends AppCompatActivity implements ActivityMethod
     private boolean isNew = true;
     private String date = "";
     private ProgressDialog progressDialog1;
-    private HttpUtil httpUtil=new HttpUtil(App.getContext());
+    private HttpUtil httpUtil = new HttpUtil(App.getContext());
 
     @SuppressLint("HandlerLeak")
     private Handler handler = new Handler()
@@ -195,7 +195,7 @@ public class TeacherActivity extends AppCompatActivity implements ActivityMethod
 
         name.getEditText().setText(teacher.getName());
         class_edit.getEditText().setText(teacher.getSubject());
-        class_edit.getEditText().setHint("科目");
+        class_edit.setHint("科目");
         number_edit.setVisibility(View.GONE);
         work_edit.setVisibility(View.GONE);
         birthday.setText("生日：" + date);
@@ -410,13 +410,17 @@ public class TeacherActivity extends AppCompatActivity implements ActivityMethod
                         final List<String> pathList = pictureChooser.getList();
                         for (int i = 0; i < pathList.size(); i++)
                         {
-                            if (pathList.get(i).substring(0,4).equals("http"))
+                            if (pathList.get(i).substring(0, 4).equals("http"))
                             {
+                                if (i == pathList.size() - 1)
+                                {
+                                    progressDialog1.dismiss();
+                                }
                                 continue;
                             }
                             File file = new File(pathList.get(i));
                             RequestBody fileBody = RequestBody.create(MediaType.parse("image/*"), file);
-                            String fileName=file.getName();
+                            String fileName = file.getName();
                             RequestBody requestBody = new MultipartBody.Builder()
                                     .setType(MultipartBody.FORM)
                                     .addFormDataPart("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"))
@@ -424,7 +428,7 @@ public class TeacherActivity extends AppCompatActivity implements ActivityMethod
                                     .addFormDataPart("type", "teacher")
                                     .addFormDataPart("method", "uploadFile")
                                     .addFormDataPart("name", name.getEditText().getText().toString())
-                                    .addFormDataPart("upload_file",fileName,fileBody)
+                                    .addFormDataPart("upload_file", fileName, fileBody)
                                     .build();
                             Request request = new Request.Builder()
                                     .url(getString(R.string.request_url))
@@ -451,10 +455,15 @@ public class TeacherActivity extends AppCompatActivity implements ActivityMethod
                                 {
                                     String s = response.body().string();
                                     Logs.i(TAG, "onResponse: " + s);
-                                    Response response1 = new Gson().fromJson(s, Response.class);
                                     Message message = new Message();
+                                    try
+                                    {
+                                        message.obj = new Gson().fromJson(s, Response.class);
+                                    } catch (Exception e)
+                                    {
+                                        message.obj = new Response(404, "文件错误！");
+                                    }
                                     message.what = HANDLER;
-                                    message.obj = response1;
                                     if (finalI == pathList.size() - 1)
                                     {
                                         message.arg1 = 0;

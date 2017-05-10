@@ -27,7 +27,6 @@ public class MainActivity extends AppCompatActivity implements ActivityMethod
     private DrawerLayout drawerLayout;
     private FloatingActionButton fab;
     private LinearLayout student_layout, teacher_layout;
-    private int type = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -75,12 +74,10 @@ public class MainActivity extends AppCompatActivity implements ActivityMethod
                 switch (item.getItemId())
                 {
                     case R.id.nav_teacher:
-                        type = 1;
                         student_layout.setVisibility(View.GONE);
                         teacher_layout.setVisibility(View.VISIBLE);
                         break;
                     case R.id.nav_classmates:
-                        type = 2;
                         student_layout.setVisibility(View.VISIBLE);
                         teacher_layout.setVisibility(View.GONE);
                         break;
@@ -103,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements ActivityMethod
             @Override
             public void onClick(View view)
             {
-                startActivity(new Intent(App.getContext(), type == 1 ? TeacherActivity.class : ClassmatesActivity.class));
+                startActivity(new Intent(App.getContext(), student_layout.getVisibility()==View.VISIBLE ? ClassmatesActivity.class : TeacherActivity.class));
             }
         });
     }

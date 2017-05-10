@@ -117,7 +117,7 @@ public class ShowActivity extends AppCompatActivity implements ActivityMethod
                 map.put("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"));
                 map.put("method", "deleteActivity");
                 map.put("userType", "activity");
-                map.put("name", activityShowList.remove(position).getActivityName());
+                map.put("activityName", activityShowList.remove(position).getActivityName());
                 new HttpUtil(App.getContext())
                         .setUrl(getString(R.string.request_url))
                         .setRequestMethod(HttpUtil.RequestMethod.POST)

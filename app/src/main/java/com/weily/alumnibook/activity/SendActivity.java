@@ -17,6 +17,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.mystery0.tools.Logs.Logs;
 import com.mystery0.tools.MysteryNetFrameWork.HttpUtil;
 import com.mystery0.tools.MysteryNetFrameWork.ResponseListener;
 import com.weily.alumnibook.ActivityMethod;
@@ -37,6 +38,7 @@ import java.util.Map;
 
 public class SendActivity extends AppCompatActivity implements ActivityMethod
 {
+    private static final String TAG = "SendActivity";
     private static final int INTENT = 2333;
     private Toolbar toolbar;
     private Button btn_choose_user;
@@ -95,6 +97,7 @@ public class SendActivity extends AppCompatActivity implements ActivityMethod
                         {
                             if (i == 1)
                             {
+                                Logs.i(TAG, "onResponse: "+s);
                                 ShowList showList = new Gson().fromJson(s, ShowList.class);
                                 classmatesArrayList.clear();
                                 teacherArrayList.clear();
