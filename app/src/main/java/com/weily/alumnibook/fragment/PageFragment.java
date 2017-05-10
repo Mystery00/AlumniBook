@@ -9,9 +9,11 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.mystery0.tools.Logs.Logs;
@@ -21,6 +23,9 @@ import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
 import com.weily.alumnibook.adapter.ClassmatesAdapter;
 import com.weily.alumnibook.adapter.TeacherAdapter;
+import com.weily.alumnibook.classs.Classmates;
+import com.weily.alumnibook.classs.Response;
+import com.weily.alumnibook.classs.Teacher;
 import com.weily.alumnibook.classs.Teachers;
 import com.weily.alumnibook.classs.User;
 
@@ -29,6 +34,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
 
 public class PageFragment extends Fragment
 {
@@ -80,6 +87,59 @@ public class PageFragment extends Fragment
             }
             classmatesRecycler.setAdapter(adapter);
             swipeRefreshLayout.setRefreshing(false);
+            ItemTouchHelper.Callback callback = new ItemTouchHelper.SimpleCallback(0, RIGHT)
+            {
+
+                @Override
+                public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)
+                {
+                    return false;
+                }
+
+                @Override
+                public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction)
+                {
+                    int position = viewHolder.getAdapterPosition();
+                    adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                    Logs.i(TAG, "onSwiped: 滑动删除");
+                    Map<String, String> map = new HashMap<>();
+                    map.put("username", App.getContext().getSharedPreferences(getString(R.string.shared_preference_name), Context.MODE_PRIVATE).getString("username", "test"));
+                    Object object = dataList.remove(position);
+                    if (object instanceof Classmates)
+                    {
+                        map.put("method", "deleteStudent");
+                        map.put("userType", "student");
+                        map.put("name", ((Classmates) object).getName());
+                    } else
+                    {
+                        map.put("method", "deleteTeacher");
+                        map.put("userType", "teacher");
+                        map.put("name", ((Teacher) object).getName());
+                    }
+                    new HttpUtil(App.getContext())
+                            .setUrl(getString(R.string.request_url))
+                            .setRequestMethod(HttpUtil.RequestMethod.POST)
+                            .setMap(map)
+                            .setResponseListener(new ResponseListener()
+                            {
+                                @Override
+                                public void onResponse(int i, String s)
+                                {
+                                    if (i == 1)
+                                    {
+                                        Response response = new Gson().fromJson(s, Response.class);
+                                        Toast.makeText(App.getContext(), response.getContent(), Toast.LENGTH_SHORT)
+                                                .show();
+                                        swipeRefreshLayout.setRefreshing(true);
+                                        postRequest(type, PageFragment.this.position);
+                                    }
+                                }
+                            })
+                            .open();
+                }
+            };
+            ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+            itemTouchHelper.attachToRecyclerView(classmatesRecycler);
         }
     };
 

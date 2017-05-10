@@ -71,7 +71,7 @@ public class SendActivity extends AppCompatActivity implements ActivityMethod
         textView_choose = (TextView) findViewById(R.id.checkList);
         btn_choose_time = (Button) findViewById(R.id.choose_time);
 
-        if (getIntent().getBundleExtra("activity").getSerializable("activity") != null)
+        if (getIntent().getBundleExtra("activity") != null)
         {
             ActivityShow activityShow = (ActivityShow) getIntent().getBundleExtra("activity").getSerializable("activity");
             date = activityShow.getActivityDate();

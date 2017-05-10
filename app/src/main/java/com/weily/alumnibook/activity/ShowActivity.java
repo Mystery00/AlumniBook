@@ -9,9 +9,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.mystery0.tools.Logs.Logs;
@@ -23,6 +25,7 @@ import com.weily.alumnibook.R;
 import com.weily.alumnibook.adapter.ActivityShowAdapter;
 import com.weily.alumnibook.classs.Activity;
 import com.weily.alumnibook.classs.ActivityShow;
+import com.weily.alumnibook.classs.Response;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,12 +33,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static android.support.v7.widget.helper.ItemTouchHelper.RIGHT;
+
 
 public class ShowActivity extends AppCompatActivity implements ActivityMethod
 {
 
     private static final String TAG = "ShowActivity";
     private Toolbar toolbar;
+    private RecyclerView activityRecycler;
     private SwipeRefreshLayout swipeRefreshLayout;
     private ActivityShowAdapter adapter;
     private List<ActivityShow> activityShowList = new ArrayList<>();
@@ -53,7 +59,7 @@ public class ShowActivity extends AppCompatActivity implements ActivityMethod
     {
         setContentView(R.layout.activity_show_activity_recycler);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        RecyclerView activityRecycler = (RecyclerView) findViewById(R.id.activity_recycler);
+        activityRecycler = (RecyclerView) findViewById(R.id.activity_recycler);
         swipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
 
         swipeRefreshLayout.setColorSchemeResources(
@@ -65,8 +71,8 @@ public class ShowActivity extends AppCompatActivity implements ActivityMethod
         activityRecycler.setLayoutManager(linearLayoutManager);
         adapter = new ActivityShowAdapter(activityShowList);
         activityRecycler.setAdapter(adapter);
-        request();
         swipeRefreshLayout.setRefreshing(true);
+        request();
 
         setSupportActionBar(toolbar);
     }
@@ -92,6 +98,50 @@ public class ShowActivity extends AppCompatActivity implements ActivityMethod
                 request();
             }
         });
+        ItemTouchHelper.Callback callback = new ItemTouchHelper.SimpleCallback(0, RIGHT)
+        {
+
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target)
+            {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction)
+            {
+                int position = viewHolder.getAdapterPosition();
+                adapter.notifyItemRemoved(viewHolder.getAdapterPosition());
+                Logs.i(TAG, "onSwiped: 滑动删除");
+                Map<String, String> map = new HashMap<>();
+                map.put("username", getSharedPreferences(getString(R.string.shared_preference_name), MODE_PRIVATE).getString("username", "test"));
+                map.put("method", "deleteActivity");
+                map.put("userType", "activity");
+                map.put("name", activityShowList.remove(position).getActivityName());
+                new HttpUtil(App.getContext())
+                        .setUrl(getString(R.string.request_url))
+                        .setRequestMethod(HttpUtil.RequestMethod.POST)
+                        .setMap(map)
+                        .setResponseListener(new ResponseListener()
+                        {
+                            @Override
+                            public void onResponse(int i, String s)
+                            {
+                                if (i == 1)
+                                {
+                                    Response response = new Gson().fromJson(s, Response.class);
+                                    Toast.makeText(App.getContext(), response.getContent(), Toast.LENGTH_SHORT)
+                                            .show();
+                                    swipeRefreshLayout.setRefreshing(true);
+                                    request();
+                                }
+                            }
+                        })
+                        .open();
+            }
+        };
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(activityRecycler);
     }
 
     private void request()
