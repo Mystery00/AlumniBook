@@ -10,7 +10,6 @@ import android.widget.TextView;
 
 import com.weily.alumnibook.App;
 import com.weily.alumnibook.R;
-import com.weily.alumnibook.activity.ActivityShowActivity;
 import com.weily.alumnibook.activity.SendActivity;
 import com.weily.alumnibook.classs.ActivityShow;
 

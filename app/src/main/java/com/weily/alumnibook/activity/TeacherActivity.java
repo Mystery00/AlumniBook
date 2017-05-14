@@ -312,10 +312,11 @@ public class TeacherActivity extends AppCompatActivity implements ActivityMethod
                     Calendar calendar = Calendar.getInstance();
                     dates = new String[]{String.valueOf(calendar.get(Calendar.YEAR)), String.valueOf(calendar.get(Calendar.MONTH)), String.valueOf(calendar.get(Calendar.DATE))};
                 }
-                final DatePicker datePicker = new DatePicker(TeacherActivity.this);
+                final DatePicker datePicker = new DatePicker(TeacherActivity.this,null,R.style.hmp);
                 datePicker.init(Integer.parseInt(dates[0]), Integer.parseInt(dates[1]), Integer.parseInt(dates[2]), null);
                 new AlertDialog.Builder(TeacherActivity.this)
                         .setView(datePicker)
+                        .setTitle("请选择时间：")
                         .setNegativeButton("取消", null)
                         .setPositiveButton("确定", new DialogInterface.OnClickListener()
                         {
