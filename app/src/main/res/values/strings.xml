@@ -2,7 +2,7 @@
     <string name="app_name">AlumniBook</string>
     <string name="action_settings">Settings</string>
 
-    <string name="request_url">http://www.mystery0.vip/php/alumnibook/alumnibook.php</string>
+    <string name="request_url">http://123.206.186.70/php/alumnibook/alumnibook.php</string>
     <string name="shared_preference_name">login</string>
     <string name="title_activity_choose_people">ChoosePeopleActivity</string>
 </resources>
