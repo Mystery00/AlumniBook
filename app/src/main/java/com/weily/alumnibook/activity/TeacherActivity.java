@@ -157,7 +157,7 @@ public class TeacherActivity extends AppCompatActivity implements ActivityMethod
                                 FileList fileList = new Gson().fromJson(s, FileList.class);
                                 for (MyFile temp : fileList.getFiles())
                                 {
-                                    photoList.add("http://www.mystery0.vip//php/alumnibook/uploads/" + temp.getFileName());
+                                    photoList.add("http://123.206.186.70/php/alumnibook/uploads/" + temp.getFileName());
                                 }
                                 pictureChooser.setList(photoList);
                             }
