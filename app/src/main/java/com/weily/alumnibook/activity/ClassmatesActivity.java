@@ -15,6 +15,7 @@ import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -315,10 +316,12 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                     Calendar calendar = Calendar.getInstance();
                     dates = new String[]{String.valueOf(calendar.get(Calendar.YEAR)), String.valueOf(calendar.get(Calendar.MONTH)), String.valueOf(calendar.get(Calendar.DATE))};
                 }
-                final DatePicker datePicker = new DatePicker(ClassmatesActivity.this,null,R.style.hmp);
+                final View view= LayoutInflater.from(ClassmatesActivity.this).inflate(R.layout.dialog_datepicker,null);
+//                final DatePicker datePicker = new DatePicker(ClassmatesActivity.this,null,R.style.hmp);
+                final DatePicker datePicker= (DatePicker) view.findViewById(R.id.datePicker);
                 datePicker.init(Integer.parseInt(dates[0]), Integer.parseInt(dates[1]), Integer.parseInt(dates[2]), null);
                 new AlertDialog.Builder(ClassmatesActivity.this)
-                        .setView(datePicker)
+                        .setView(view)
                         .setTitle("请选择时间：")
                         .setNegativeButton("取消", null)
                         .setPositiveButton("确定", new DialogInterface.OnClickListener()
@@ -326,7 +329,7 @@ public class ClassmatesActivity extends AppCompatActivity implements ActivityMet
                             @Override
                             public void onClick(DialogInterface dialog, int which)
                             {
-                                date = datePicker.getYear() + "-" + datePicker.getMonth() + "-" + datePicker.getDayOfMonth();
+                                date = datePicker.getYear() + "-" + (datePicker.getMonth()+1) + "-" + datePicker.getDayOfMonth();
                                 birthday.setText("生日：" + date);
                             }
                         })
